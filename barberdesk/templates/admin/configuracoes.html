@@ -11,7 +11,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-shop"></i> Dados da Barbearia</h6></div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                    <form method="POST" action="{{ url_for('admin.configuracoes') }}">
                         <input type="hidden" name="secao" value="dados">
                         <div class="mb-3">
                             <label class="form-label">Nome</label>
@@ -50,7 +50,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp</h6></div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                    <form method="POST" action="{{ url_for('admin.configuracoes') }}">
                         <input type="hidden" name="secao" value="whatsapp">
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" name="wpp_confirmacao" {{ 'checked' if barbearia.wpp_confirmacao }}>
@@ -95,7 +95,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-star"></i> Programa de Fidelidade</h6></div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                    <form method="POST" action="{{ url_for('admin.configuracoes') }}">
                         <input type="hidden" name="secao" value="fidelidade">
                         {% set config_fid = barbearia.get_config_fidelidade() %}
                         <div class="mb-3">

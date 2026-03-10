@@ -38,7 +38,7 @@
                             <td>{{ c.total_visitas }}</td>
                             <td>{{ c.ultima_visita or 'Nunca' }}</td>
                             <td>
-                                <a href="{{ url_for('admin.cliente_detalhe', id=c.id) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ url_for('admin.cliente_detalhe', cliente_id=c.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
                             </td>

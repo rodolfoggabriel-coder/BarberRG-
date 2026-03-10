@@ -1,0 +1,98 @@
+{% extends "components/admin_base.html" %}
+{% block title %}{{ 'Editar' if despesa else 'Nova' }} Despesa - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>
+            <i class="bi bi-cash-coin"></i>
+            {{ 'Editar Despesa' if despesa else 'Nova Despesa' }}
+        </h4>
+        <a href="{{ url_for('admin.financeiro') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.despesa_editar', despesa_id=despesa.id) if despesa else url_for('admin.despesa_nova') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Descricao *</label>
+                            <input type="text" name="descricao" class="form-control" value="{{ despesa.descricao if despesa else '' }}" required placeholder="Ex: Aluguel, Energia, Material">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Valor (R$) *</label>
+                                <input type="number" name="valor" class="form-control" step="0.01" min="0" value="{{ '%.2f'|format(despesa.valor) if despesa else '' }}" required placeholder="0.00">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Categoria</label>
+                                <select name="categoria" class="form-select">
+                                    {% set cat = despesa.categoria if despesa else 'outros' %}
+                                    <option value="aluguel" {% if cat == 'aluguel' %}selected{% endif %}>Aluguel</option>
+                                    <option value="energia" {% if cat == 'energia' %}selected{% endif %}>Energia</option>
+                                    <option value="agua" {% if cat == 'agua' %}selected{% endif %}>Agua</option>
+                                    <option value="internet" {% if cat == 'internet' %}selected{% endif %}>Internet</option>
+                                    <option value="telefone" {% if cat == 'telefone' %}selected{% endif %}>Telefone</option>
+                                    <option value="material" {% if cat == 'material' %}selected{% endif %}>Material</option>
+                                    <option value="manutencao" {% if cat == 'manutencao' %}selected{% endif %}>Manutencao</option>
+                                    <option value="salario" {% if cat == 'salario' %}selected{% endif %}>Salario</option>
+                                    <option value="imposto" {% if cat == 'imposto' %}selected{% endif %}>Imposto</option>
+                                    <option value="marketing" {% if cat == 'marketing' %}selected{% endif %}>Marketing</option>
+                                    <option value="outros" {% if cat == 'outros' %}selected{% endif %}>Outros</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo" class="form-select">
+                                    {% set tipo = despesa.tipo if despesa else 'variavel' %}
+                                    <option value="fixa" {% if tipo == 'fixa' %}selected{% endif %}>Fixa</option>
+                                    <option value="variavel" {% if tipo == 'variavel' %}selected{% endif %}>Variavel</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Data de Vencimento</label>
+                                <input type="date" name="data_vencimento" class="form-control" value="{{ despesa.data_vencimento.isoformat() if despesa and despesa.data_vencimento else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="pago" id="pago"
+                                {% if despesa and despesa.pago %}checked{% endif %}>
+                            <label class="form-check-label" for="pago">
+                                <i class="bi bi-check-circle"></i> Ja foi pago
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.financeiro') }}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ 'Salvar Alteracoes' if despesa else 'Registrar Despesa' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if despesa %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Zona de Perigo</h6>
+                    <form method="POST" action="{{ url_for('admin.despesa_excluir', despesa_id=despesa.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir esta despesa?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i> Excluir Despesa
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

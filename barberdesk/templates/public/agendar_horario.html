@@ -1,0 +1,128 @@
+{% extends "components/base.html" %}
+{% block title %}Escolha o Horario - {{ barbearia.nome }}{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('public.agendar', slug=barbearia.slug) }}">
+            <i class="bi bi-scissors"></i> {{ barbearia.nome }}
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <!-- Progress -->
+    <div class="d-flex justify-content-center mb-4">
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">1. Servico</span>
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">2. Barbeiro</span>
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">3. Data</span>
+        <span class="badge bg-primary rounded-pill px-3 py-2">4. Horario</span>
+    </div>
+
+    <p class="text-muted mb-1">Resumo:</p>
+    <h5 class="mb-0">{{ servico.nome }} <small class="text-primary">R$ {{ "%.2f"|format(servico.preco) }}</small></h5>
+    <p class="text-muted">
+        {{ data.strftime('%d/%m/%Y') }}
+        {% if barbeiro %} com <strong>{{ barbeiro.nome }}</strong>{% endif %}
+    </p>
+
+    <h4 class="mb-3"><i class="bi bi-clock"></i> Escolha o Horario</h4>
+
+    {% if horarios_por_barbeiro %}
+        {% for item in horarios_por_barbeiro %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white d-flex align-items-center">
+                {% if item.barbeiro.foto %}
+                <img src="{{ item.barbeiro.foto }}" alt="{{ item.barbeiro.nome }}" class="rounded-circle me-2"
+                     width="32" height="32" style="object-fit: cover;">
+                {% else %}
+                <i class="bi bi-person-circle fs-4 me-2 text-secondary"></i>
+                {% endif %}
+                <strong>{{ item.barbeiro.nome }}</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for hora in item.horarios %}
+                    <div class="col-3 col-md-2">
+                        <button type="button" class="btn btn-outline-primary w-100 horario-btn"
+                                data-hora="{{ hora }}" data-barbeiro="{{ item.barbeiro.id }}">
+                            {{ hora }}
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Client data form (hidden until time is selected) -->
+        <div id="form-cliente" style="display: none;">
+            <h5 class="mb-3 mt-4"><i class="bi bi-person"></i> Seus Dados</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('public.agendar_confirmar', slug=barbearia.slug) }}">
+                        <input type="hidden" name="servico_id" value="{{ servico.id }}">
+                        <input type="hidden" name="barbeiro_id" id="barbeiro-id-input">
+                        <input type="hidden" name="data" value="{{ data.isoformat() }}">
+                        <input type="hidden" name="hora" id="hora-input">
+
+                        <div class="mb-3">
+                            <label class="form-label">Nome completo *</label>
+                            <input type="text" name="nome" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone (WhatsApp) *</label>
+                            <input type="tel" name="telefone" class="form-control" required placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observacao (opcional)</label>
+                            <textarea name="observacao" class="form-control" rows="2" placeholder="Algum pedido especial?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
+                            <i class="bi bi-check-circle"></i> Confirmar Agendamento
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <p class="text-muted mt-3">Nenhum horario disponivel nesta data.</p>
+        <a href="{{ url_for('public.agendar_data', slug=barbearia.slug, servico_id=servico.id, barbeiro_id=barbeiro_id) }}"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Escolher outra data
+        </a>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('public.agendar_data', slug=barbearia.slug, servico_id=servico.id, barbeiro_id=barbeiro_id) }}"
+       class="btn btn-outline-secondary mt-3">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.horario-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.horario-btn').forEach(function(b) {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline-primary');
+        });
+        this.classList.remove('btn-outline-primary');
+        this.classList.add('btn-primary');
+
+        document.getElementById('hora-input').value = this.dataset.hora;
+        document.getElementById('barbeiro-id-input').value = this.dataset.barbeiro;
+
+        const formCliente = document.getElementById('form-cliente');
+        formCliente.style.display = 'block';
+        formCliente.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+</script>
+{% endblock %}

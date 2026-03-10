@@ -1,0 +1,120 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Metas - {{ barbeiro.nome }} - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-trophy"></i> Metas de {{ barbeiro.nome }}</h4>
+        <a href="{{ url_for('admin.barbeiros') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label">Mes</label>
+                    <select name="mes" class="form-select">
+                        {% for m in range(1, 13) %}
+                        <option value="{{ m }}" {{ 'selected' if m == mes }}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">Ano</label>
+                    <select name="ano" class="form-select">
+                        {% for a in range(ano - 1, ano + 2) %}
+                        <option value="{{ a }}" {{ 'selected' if a == ano }}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Ver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3"><i class="bi bi-pencil"></i> Definir Meta {{ mes }}/{{ ano }}</h5>
+                    <form method="POST" action="{{ url_for('admin.barbeiro_metas', barbeiro_id=barbeiro.id) }}">
+                        <input type="hidden" name="mes" value="{{ mes }}">
+                        <input type="hidden" name="ano" value="{{ ano }}">
+                        <div class="mb-3">
+                            <label class="form-label">Meta de Atendimentos</label>
+                            <input type="number" name="meta_atendimentos" class="form-control"
+                                   value="{{ meta.meta_atendimentos if meta else 0 }}" min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Meta de Faturamento (R$)</label>
+                            <input type="number" name="meta_faturamento" class="form-control" step="0.01"
+                                   value="{{ meta.meta_faturamento if meta else 0 }}" min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nota Minima</label>
+                            <input type="number" name="meta_nota_minima" class="form-control" step="0.1"
+                                   value="{{ meta.meta_nota_minima if meta else 4.0 }}" min="0" max="5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Bonus</label>
+                            <select name="bonus_tipo" class="form-select">
+                                <option value="fixo" {{ 'selected' if meta and meta.bonus_tipo == 'fixo' }}>Valor Fixo</option>
+                                <option value="percentual" {{ 'selected' if meta and meta.bonus_tipo == 'percentual' }}>Percentual</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor do Bonus</label>
+                            <input type="number" name="bonus_valor" class="form-control" step="0.01"
+                                   value="{{ meta.bonus_valor if meta else 0 }}" min="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg"></i> Salvar Meta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3"><i class="bi bi-graph-up"></i> Progresso {{ mes }}/{{ ano }}</h5>
+                    {% if meta %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Atendimentos</span>
+                            <span>{{ atendimentos_realizados }} / {{ meta.meta_atendimentos }}</span>
+                        </div>
+                        {% set pct_atend = (atendimentos_realizados / meta.meta_atendimentos * 100) if meta.meta_atendimentos > 0 else 0 %}
+                        <div class="progress">
+                            <div class="progress-bar {{ 'bg-success' if pct_atend >= 100 else 'bg-primary' }}"
+                                 style="width: {{ [pct_atend, 100] | min }}%">{{ pct_atend | round(0) }}%</div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Faturamento</span>
+                            <span>{{ faturamento_atual }} / R$ {{ "%.2f" | format(meta.meta_faturamento) }}</span>
+                        </div>
+                        {% set pct_fat = (faturamento_atual_raw / meta.meta_faturamento * 100) if meta.meta_faturamento > 0 else 0 %}
+                        <div class="progress">
+                            <div class="progress-bar {{ 'bg-success' if pct_fat >= 100 else 'bg-info' }}"
+                                 style="width: {{ [pct_fat, 100] | min }}%">{{ pct_fat | round(0) }}%</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-4"></i>
+                        <p class="mt-2">Nenhuma meta definida para este periodo.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

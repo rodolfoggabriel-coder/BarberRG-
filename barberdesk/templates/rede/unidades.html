@@ -1,0 +1,109 @@
+{% extends "components/base.html" %}
+{% block title %}Unidades - {{ grupo.nome }}{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk <span class="badge bg-primary">Rede</span>
+        </a>
+        <div class="navbar-nav ms-auto flex-row gap-3">
+            <a class="nav-link" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link active" href="{{ url_for('rede.listar_unidades') }}"><i class="bi bi-buildings"></i> Unidades</a>
+            <a class="nav-link" href="{{ url_for('rede.catalogo') }}"><i class="bi bi-list-check"></i> Catalogo</a>
+            <a class="nav-link" href="{{ url_for('rede.royalties') }}"><i class="bi bi-percent"></i> Royalties</a>
+            <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-buildings"></i> Unidades da Rede</h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAdicionarUnidade">
+            <i class="bi bi-plus-lg"></i> Adicionar Unidade
+        </button>
+    </div>
+
+    {% if unidades %}
+    <div class="row g-3">
+        {% for u in unidades %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 {{ 'opacity-50' if not u.ativo }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="mb-0">{{ u.nome }}</h5>
+                        {% if u.ativo %}
+                        <span class="badge bg-success">Ativa</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inativa</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted small mb-2">{{ u.endereco or 'Endereco nao cadastrado' }}</p>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-link-45deg"></i> {{ u.slug }}
+                    </p>
+                </div>
+                <div class="card-footer bg-white d-flex gap-2">
+                    <a href="{{ url_for('rede.ver_unidade', barbearia_id=u.id) }}" class="btn btn-sm btn-outline-primary flex-fill">
+                        <i class="bi bi-eye"></i> Detalhes
+                    </a>
+                    <a href="{{ url_for('rede.entrar_unidade', barbearia_id=u.id) }}" class="btn btn-sm btn-outline-info flex-fill">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar
+                    </a>
+                    <form method="POST" action="{{ url_for('rede.desativar_unidade', barbearia_id=u.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-sm {{ 'btn-outline-warning' if u.ativo else 'btn-outline-success' }}"
+                                title="{{ 'Desativar' if u.ativo else 'Ativar' }}">
+                            <i class="bi {{ 'bi-pause-circle' if u.ativo else 'bi-play-circle' }}"></i>
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('rede.remover_unidade', barbearia_id=u.id) }}" class="d-inline"
+                          onsubmit="return confirm('Tem certeza que deseja remover esta unidade da rede?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover da rede">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-buildings display-1 text-muted"></i>
+        <p class="text-muted mt-3">Nenhuma unidade cadastrada na rede.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal Adicionar Unidade -->
+<div class="modal fade" id="modalAdicionarUnidade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('rede.adicionar_unidade') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Unidade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Informe o slug da barbearia ja cadastrada no BarberDesk para vincula-la a esta rede.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Slug da Barbearia *</label>
+                        <input type="text" name="slug" class="form-control" required
+                               placeholder="ex: minha-barbearia">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i> Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

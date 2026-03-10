@@ -1,0 +1,169 @@
+{% extends "components/base.html" %}
+{% block title %}{{ barbearia.nome }} - {{ grupo.nome }}{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk <span class="badge bg-primary">Rede</span>
+        </a>
+        <div class="navbar-nav ms-auto flex-row gap-3">
+            <a class="nav-link" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link" href="{{ url_for('rede.listar_unidades') }}"><i class="bi bi-buildings"></i> Unidades</a>
+            <a class="nav-link" href="{{ url_for('rede.catalogo') }}"><i class="bi bi-list-check"></i> Catalogo</a>
+            <a class="nav-link" href="{{ url_for('rede.royalties') }}"><i class="bi bi-percent"></i> Royalties</a>
+            <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('rede.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('rede.listar_unidades') }}">Unidades</a></li>
+            <li class="breadcrumb-item active">{{ barbearia.nome }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-shop"></i> {{ barbearia.nome }}</h4>
+        <span class="text-muted">{{ "%02d"|format(mes) }}/{{ ano }}</span>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-cash-stack text-success fs-4"></i>
+                    <h4 class="mt-2 text-success">{{ receita_fmt }}</h4>
+                    <small class="text-muted">Receita do Mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-check text-primary fs-4"></i>
+                    <h4 class="mt-2 text-primary">{{ agendamentos.concluidos }}/{{ agendamentos.total }}</h4>
+                    <small class="text-muted">Concluidos / Total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up text-info fs-4"></i>
+                    <h4 class="mt-2 text-info">{{ ocupacao }}%</h4>
+                    <small class="text-muted">Ocupacao</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-receipt text-warning fs-4"></i>
+                    <h4 class="mt-2 text-warning">{{ ticket_medio_fmt }}</h4>
+                    <small class="text-muted">Ticket Medio</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if alertas %}
+    <div class="alert alert-warning">
+        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Alertas</h6>
+        <ul class="mb-0">
+            {% for a in alertas %}
+            <li>{{ a }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Barbers -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-people"></i> Barbeiros Ativos ({{ barbeiros|length }})</h6>
+                </div>
+                <div class="card-body">
+                    {% if barbeiros %}
+                    <div class="list-group list-group-flush">
+                        {% for b in barbeiros %}
+                        <div class="list-group-item d-flex align-items-center px-0">
+                            {% if b.foto %}
+                            <img src="{{ b.foto }}" alt="{{ b.nome }}" class="rounded-circle me-3"
+                                 width="40" height="40" style="object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3"
+                                 style="width: 40px; height: 40px;">
+                                <i class="bi bi-person text-white"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ b.nome }}</strong>
+                                <br><small class="text-muted">{{ b.telefone }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3 mb-0">Nenhum barbeiro ativo.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-list-check"></i> Servicos Ativos ({{ servicos|length }})</h6>
+                </div>
+                <div class="card-body">
+                    {% if servicos %}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Servico</th>
+                                    <th class="text-end">Preco</th>
+                                    <th class="text-end">Duracao</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in servicos %}
+                                <tr>
+                                    <td>{{ s.nome }}</td>
+                                    <td class="text-end">R$ {{ "%.2f"|format(s.preco) }}</td>
+                                    <td class="text-end">{{ s.duracao_minutos }} min</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3 mb-0">Nenhum servico ativo.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('rede.listar_unidades') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Unidades
+        </a>
+        <a href="{{ url_for('rede.entrar_unidade', barbearia_id=barbearia.id) }}" class="btn btn-primary">
+            <i class="bi bi-box-arrow-in-right"></i> Entrar no Painel da Unidade
+        </a>
+    </div>
+</div>
+{% endblock %}

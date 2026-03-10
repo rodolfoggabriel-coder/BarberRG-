@@ -1,0 +1,86 @@
+{% extends "components/barbeiro_base.html" %}
+{% block title %}Concluir Atendimento - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="pt-4">
+    <h5 class="mb-4"><i class="bi bi-check-circle"></i> Concluir Atendimento</h5>
+
+    <!-- Appointment summary -->
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="text-primary mb-1">{{ agendamento.cliente.nome }}</h6>
+                    <p class="mb-1">{{ agendamento.servico.nome }}</p>
+                    <small class="text-muted">
+                        {{ agendamento.data.strftime('%d/%m/%Y') }} | {{ agendamento.hora_inicio }} - {{ agendamento.hora_fim }}
+                    </small>
+                </div>
+                <div class="text-end">
+                    <span class="fs-4 text-success">R$ {{ "%.2f"|format(agendamento.valor) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment form -->
+    <div class="card bg-dark border-secondary">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('barbeiro.concluir_atendimento', agendamento_id=agendamento.id) }}">
+                <div class="mb-3">
+                    <label class="form-label text-light">Forma de Pagamento</label>
+                    <select name="forma_pagamento" class="form-select bg-dark text-white border-secondary" required>
+                        <option value="">Selecione...</option>
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="pix">PIX</option>
+                        <option value="cartao_debito">Cartao Debito</option>
+                        <option value="cartao_credito">Cartao Credito</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-light">Desconto Fidelidade (R$)</label>
+                    <input type="number" name="desconto_fidelidade" class="form-control bg-dark text-white border-secondary"
+                           value="0" min="0" step="0.01">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-light">Desconto Plano (R$)</label>
+                    <input type="number" name="desconto_plano" class="form-control bg-dark text-white border-secondary"
+                           value="0" min="0" step="0.01">
+                </div>
+
+                <hr class="border-secondary">
+                <h6 class="text-light mb-3">
+                    <i class="bi bi-arrows-expand"></i> Pagamento Dividido (opcional)
+                </h6>
+
+                <div class="mb-3">
+                    <label class="form-label text-light">Segunda Forma de Pagamento</label>
+                    <select name="forma_pagamento_2" class="form-select bg-dark text-white border-secondary">
+                        <option value="">Nenhuma</option>
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="pix">PIX</option>
+                        <option value="cartao_debito">Cartao Debito</option>
+                        <option value="cartao_credito">Cartao Credito</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-light">Valor na 2a forma (R$)</label>
+                    <input type="number" name="valor_2" class="form-control bg-dark text-white border-secondary"
+                           value="0" min="0" step="0.01">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 mt-2">
+                    <i class="bi bi-check-lg"></i> Concluir e Registrar Pagamento
+                </button>
+
+                <a href="{{ url_for('barbeiro.agenda') }}" class="btn btn-outline-secondary w-100 py-2 mt-2">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

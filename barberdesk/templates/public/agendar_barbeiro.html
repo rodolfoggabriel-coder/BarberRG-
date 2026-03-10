@@ -1,0 +1,75 @@
+{% extends "components/base.html" %}
+{% block title %}Escolha o Barbeiro - {{ barbearia.nome }}{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('public.agendar', slug=barbearia.slug) }}">
+            <i class="bi bi-scissors"></i> {{ barbearia.nome }}
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <!-- Progress -->
+    <div class="d-flex justify-content-center mb-4">
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">1. Servico</span>
+        <span class="badge bg-primary rounded-pill px-3 py-2 me-2">2. Barbeiro</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2 me-2">3. Data</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2">4. Horario</span>
+    </div>
+
+    <p class="text-muted mb-1">Servico selecionado:</p>
+    <h5 class="mb-3">{{ servico.nome }} <small class="text-primary">R$ {{ "%.2f"|format(servico.preco) }}</small></h5>
+
+    <h4 class="mb-3"><i class="bi bi-person"></i> Escolha o Barbeiro</h4>
+
+    <!-- Any barber option -->
+    <a href="{{ url_for('public.agendar_data', slug=barbearia.slug, servico_id=servico.id, barbeiro_id=0) }}"
+       class="card text-decoration-none border-0 shadow-sm mb-3">
+        <div class="card-body d-flex align-items-center">
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3"
+                 style="width: 50px; height: 50px;">
+                <i class="bi bi-shuffle text-white fs-5"></i>
+            </div>
+            <div>
+                <h6 class="mb-0">Qualquer barbeiro disponivel</h6>
+                <small class="text-muted">Mais opcoes de horario</small>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+        </div>
+    </a>
+
+    {% for b in barbeiros %}
+    <a href="{{ url_for('public.agendar_data', slug=barbearia.slug, servico_id=servico.id, barbeiro_id=b.id) }}"
+       class="card text-decoration-none border-0 shadow-sm mb-3">
+        <div class="card-body d-flex align-items-center">
+            {% if b.foto %}
+            <img src="{{ b.foto }}" alt="{{ b.nome }}" class="rounded-circle me-3"
+                 width="50" height="50" style="object-fit: cover;">
+            {% else %}
+            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3"
+                 style="width: 50px; height: 50px;">
+                <i class="bi bi-person text-white fs-5"></i>
+            </div>
+            {% endif %}
+            <div>
+                <h6 class="mb-0">{{ b.nome }}</h6>
+                {% if b.media_nota %}
+                <small class="text-warning">
+                    <i class="bi bi-star-fill"></i> {{ b.media_nota }}
+                </small>
+                {% endif %}
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+        </div>
+    </a>
+    {% endfor %}
+
+    <a href="{{ url_for('public.agendar', slug=barbearia.slug) }}" class="btn btn-outline-secondary mt-3">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+{% endblock %}

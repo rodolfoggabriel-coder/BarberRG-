@@ -1,0 +1,53 @@
+{% extends "components/base.html" %}
+{% block title %}Setup - Dados da Barbearia{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Progress indicator -->
+            <div class="d-flex justify-content-center mb-4">
+                {% for i in range(1, 5) %}
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center {% if i == step %}bg-primary text-white{% elif i < step %}bg-success text-white{% else %}bg-secondary text-white{% endif %}" style="width: 36px; height: 36px; font-weight: bold;">
+                        {% if i < step %}<i class="bi bi-check"></i>{% else %}{{ i }}{% endif %}
+                    </div>
+                    {% if i < 4 %}
+                    <div style="width: 40px; height: 3px;" class="{% if i < step %}bg-success{% else %}bg-secondary opacity-25{% endif %}"></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <p class="text-center text-muted mb-4">Etapa {{ step }} de 4</p>
+
+            <div class="card border-0 shadow">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-1"><i class="bi bi-shop"></i> Dados da Barbearia</h4>
+                    <p class="text-muted mb-4">Preencha as informacoes basicas do seu estabelecimento.</p>
+
+                    <form method="POST" action="{{ url_for('admin.setup', step=1) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Barbearia *</label>
+                            <input type="text" name="nome" class="form-control" value="{{ barbearia.nome or '' }}" required placeholder="Ex: Barbearia do Joao">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" name="telefone" class="form-control" value="{{ barbearia.telefone or '' }}" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Endereco</label>
+                            <input type="text" name="endereco" class="form-control" value="{{ barbearia.endereco or '' }}" placeholder="Rua, numero - Bairro, Cidade">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                Proximo <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

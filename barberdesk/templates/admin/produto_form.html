@@ -1,0 +1,167 @@
+{% extends "components/admin_base.html" %}
+{% block title %}{{ 'Editar' if produto else 'Novo' }} Produto - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>
+            <i class="bi bi-box"></i>
+            {{ 'Editar Produto' if produto else 'Novo Produto' }}
+        </h4>
+        <a href="{{ url_for('admin.produtos') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.produto_editar', produto_id=produto.id) if produto else url_for('admin.produto_novo') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Nome *</label>
+                            <input type="text" name="nome" class="form-control" value="{{ produto.nome if produto else '' }}" required placeholder="Ex: Pomada Modeladora">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descricao</label>
+                            <textarea name="descricao" class="form-control" rows="2" placeholder="Descricao do produto">{{ produto.descricao if produto and produto.descricao else '' }}</textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Preco de Custo (R$)</label>
+                                <input type="number" name="preco_custo" class="form-control" step="0.01" min="0" value="{{ '%.2f'|format(produto.preco_custo) if produto else '0.00' }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Preco de Venda (R$) *</label>
+                                <input type="number" name="preco_venda" class="form-control" step="0.01" min="0" value="{{ '%.2f'|format(produto.preco_venda) if produto else '' }}" required placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <label class="form-label">Unidade</label>
+                                <select name="unidade" class="form-select">
+                                    {% set un = produto.unidade if produto else 'un' %}
+                                    <option value="un" {% if un == 'un' %}selected{% endif %}>Unidade</option>
+                                    <option value="ml" {% if un == 'ml' %}selected{% endif %}>ml</option>
+                                    <option value="g" {% if un == 'g' %}selected{% endif %}>g</option>
+                                    <option value="L" {% if un == 'L' %}selected{% endif %}>Litro</option>
+                                    <option value="kg" {% if un == 'kg' %}selected{% endif %}>kg</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">Estoque Atual</label>
+                                {% if produto %}
+                                <input type="number" class="form-control" value="{{ produto.estoque_atual }}" disabled>
+                                <small class="text-muted">Use movimentacoes para alterar.</small>
+                                {% else %}
+                                <input type="number" name="estoque_atual" class="form-control" min="0" value="0">
+                                {% endif %}
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">Estoque Minimo</label>
+                                <input type="number" name="estoque_minimo" class="form-control" min="0" value="{{ produto.estoque_minimo if produto else 5 }}">
+                            </div>
+                        </div>
+
+                        {% if produto %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo"
+                                {% if produto.ativo %}checked{% endif %}>
+                            <label class="form-check-label" for="ativo">Ativo</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.produtos') }}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ 'Salvar Alteracoes' if produto else 'Cadastrar' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if produto %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Zona de Perigo</h6>
+                    <form method="POST" action="{{ url_for('admin.produto_excluir', produto_id=produto.id) }}" onsubmit="return confirm('Tem certeza que deseja desativar este produto?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-x-circle"></i> Desativar Produto
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if produto %}
+        <div class="col-md-5">
+            <!-- Movimentacao de Estoque -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-arrow-left-right"></i> Nova Movimentacao</h6>
+                    <form method="POST" action="{{ url_for('admin.produto_movimentar', produto_id=produto.id) }}">
+                        <div class="mb-2">
+                            <select name="tipo" class="form-select">
+                                <option value="entrada">Entrada</option>
+                                <option value="saida">Saida</option>
+                                <option value="venda">Venda</option>
+                                <option value="ajuste">Ajuste (definir quantidade)</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <input type="number" name="quantidade" class="form-control" min="0.01" step="0.01" placeholder="Quantidade" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="motivo" class="form-control" placeholder="Motivo (opcional)">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-check"></i> Registrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Historico -->
+            {% if movimentacoes is defined and movimentacoes %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6><i class="bi bi-clock-history"></i> Historico de Movimentacoes</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Qtd</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in movimentacoes %}
+                                <tr>
+                                    <td><small>{{ m.data.strftime('%d/%m/%Y %H:%M') }}</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if m.tipo == 'entrada' else 'danger' if m.tipo in ('saida', 'venda') else 'info' }}">
+                                            {{ m.tipo }}
+                                        </span>
+                                    </td>
+                                    <td>{{ m.quantidade }}</td>
+                                    <td><small>{{ m.motivo or '-' }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

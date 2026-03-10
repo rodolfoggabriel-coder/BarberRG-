@@ -1,0 +1,98 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Fidelidade - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-star"></i> Programa de Fidelidade</h4>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3"><i class="bi bi-gear"></i> Configuracoes</h5>
+
+                    <form method="POST" action="{{ url_for('admin.fidelidade') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Pontos por Real gasto</label>
+                            <input type="number" name="pontos_por_real" class="form-control" min="1" value="{{ config.pontos_por_real|default(1) }}">
+                            <small class="text-muted">Quantos pontos o cliente ganha por cada R$ 1,00 gasto.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Pontos para Desconto</label>
+                            <input type="number" name="pontos_para_desconto" class="form-control" min="1" value="{{ config.pontos_para_desconto|default(100) }}">
+                            <small class="text-muted">Quantos pontos sao necessarios para resgatar um desconto.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Valor do Desconto (R$)</label>
+                            <input type="number" name="valor_desconto" class="form-control" step="0.01" min="0" value="{{ config.valor_desconto|default(10) }}">
+                            <small class="text-muted">Valor do desconto ao atingir a quantidade de pontos.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Validade dos Pontos (dias)</label>
+                            <input type="number" name="validade_dias" class="form-control" min="1" value="{{ config.validade_dias|default(90) }}">
+                            <small class="text-muted">Apos quantos dias os pontos expiram.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar Configuracoes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="bi bi-trophy"></i> Top Clientes</h5>
+
+                    {% if top_clientes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Cliente</th>
+                                    <th>Telefone</th>
+                                    <th>Pontos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in top_clientes %}
+                                <tr>
+                                    <td>
+                                        {% if loop.index <= 3 %}
+                                        <span class="badge bg-{{ 'warning' if loop.index == 1 else 'secondary' if loop.index == 2 else 'dark' }}">
+                                            {{ loop.index }}
+                                        </span>
+                                        {% else %}
+                                        {{ loop.index }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin.cliente_detalhe', cliente_id=c.id) }}" class="text-decoration-none">
+                                            {{ c.nome }}
+                                        </a>
+                                    </td>
+                                    <td><small>{{ c.telefone }}</small></td>
+                                    <td><strong>{{ c.pontos_fidelidade }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-trophy display-4"></i>
+                        <p class="mt-2">Nenhum cliente com pontos ainda.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

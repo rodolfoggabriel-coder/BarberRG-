@@ -1,0 +1,121 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Novo Agendamento - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-calendar-plus"></i> Novo Agendamento</h4>
+        <a href="{{ url_for('admin.agenda') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.agenda_novo') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Barbeiro *</label>
+                            <select name="barbeiro_id" id="barbeiro_id" class="form-select" required>
+                                <option value="">Selecione o barbeiro</option>
+                                {% for b in barbeiros %}
+                                <option value="{{ b.id }}">{{ b.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Servico *</label>
+                            <select name="servico_id" id="servico_id" class="form-select" required>
+                                <option value="">Selecione o servico</option>
+                                {% for s in servicos %}
+                                <option value="{{ s.id }}">{{ s.nome }} - R$ {{ "%.2f"|format(s.preco) }} ({{ s.duracao_minutos }} min)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Data *</label>
+                                <input type="date" name="data" id="data_agendamento" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Horario *</label>
+                                <select name="hora_inicio" id="hora_inicio" class="form-select" required>
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h6 class="mb-3"><i class="bi bi-person"></i> Dados do Cliente</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Cliente *</label>
+                            <input type="text" name="cliente_nome" class="form-control" required placeholder="Nome completo">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Telefone do Cliente *</label>
+                            <input type="tel" name="cliente_telefone" class="form-control" required placeholder="(11) 99999-9999">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observacao</label>
+                            <textarea name="observacao" class="form-control" rows="2" placeholder="Alguma observacao sobre o atendimento..."></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Criar Agendamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const barbeiroSelect = document.getElementById('barbeiro_id');
+    const servicoSelect = document.getElementById('servico_id');
+    const dataInput = document.getElementById('data_agendamento');
+    const horaSelect = document.getElementById('hora_inicio');
+
+    function carregarHorarios() {
+        const barbeiro_id = barbeiroSelect.value;
+        const servico_id = servicoSelect.value;
+        const data = dataInput.value;
+
+        if (!barbeiro_id || !servico_id || !data) return;
+
+        horaSelect.innerHTML = '<option value="">Carregando...</option>';
+
+        fetch(`{{ url_for('admin.horarios_disponiveis') }}?barbeiro_id=${barbeiro_id}&servico_id=${servico_id}&data=${data}`)
+            .then(r => r.json())
+            .then(horarios => {
+                horaSelect.innerHTML = '<option value="">Selecione</option>';
+                horarios.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h;
+                    opt.textContent = h;
+                    horaSelect.appendChild(opt);
+                });
+                if (horarios.length === 0) {
+                    horaSelect.innerHTML = '<option value="">Nenhum horario disponivel</option>';
+                }
+            })
+            .catch(() => {
+                horaSelect.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    }
+
+    barbeiroSelect.addEventListener('change', carregarHorarios);
+    servicoSelect.addEventListener('change', carregarHorarios);
+    dataInput.addEventListener('change', carregarHorarios);
+</script>
+{% endblock %}

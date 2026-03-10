@@ -1,0 +1,134 @@
+{% extends "components/admin_base.html" %}
+{% block title %}WhatsApp - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-whatsapp"></i> Configuracoes de WhatsApp</h4>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3"><i class="bi bi-bell"></i> Notificacoes Automaticas</h5>
+
+                    <form method="POST" action="{{ url_for('admin.whatsapp_settings') }}">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_confirmacao" id="wpp_confirmacao"
+                                {% if barbearia.wpp_confirmacao %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_confirmacao">
+                                <strong>Confirmacao de Agendamento</strong>
+                                <br><small class="text-muted">Envia mensagem ao cliente quando um agendamento e criado.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_lembrete_24h" id="wpp_lembrete_24h"
+                                {% if barbearia.wpp_lembrete_24h %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_lembrete_24h">
+                                <strong>Lembrete 24h antes</strong>
+                                <br><small class="text-muted">Lembra o cliente 24 horas antes do agendamento.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_lembrete_1h" id="wpp_lembrete_1h"
+                                {% if barbearia.wpp_lembrete_1h %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_lembrete_1h">
+                                <strong>Lembrete 1h antes</strong>
+                                <br><small class="text-muted">Lembra o cliente 1 hora antes do agendamento.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_pos_atendimento" id="wpp_pos_atendimento"
+                                {% if barbearia.wpp_pos_atendimento %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_pos_atendimento">
+                                <strong>Pos-Atendimento</strong>
+                                <br><small class="text-muted">Envia mensagem de agradecimento apos o atendimento.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_aniversario" id="wpp_aniversario"
+                                {% if barbearia.wpp_aniversario %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_aniversario">
+                                <strong>Aniversario</strong>
+                                <br><small class="text-muted">Envia felicitacao no aniversario do cliente.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_avaliacao" id="wpp_avaliacao"
+                                {% if barbearia.wpp_avaliacao %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_avaliacao">
+                                <strong>Solicitar Avaliacao</strong>
+                                <br><small class="text-muted">Pede avaliacao ao cliente apos o atendimento.</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_reativacao" id="wpp_reativacao"
+                                {% if barbearia.wpp_reativacao %}checked{% endif %}>
+                            <label class="form-check-label" for="wpp_reativacao">
+                                <strong>Reativacao de Clientes</strong>
+                                <br><small class="text-muted">Envia mensagem para clientes inativos.</small>
+                            </label>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Dias para considerar cliente inativo</label>
+                            <input type="number" name="wpp_dias_reativacao" class="form-control" min="7" value="{{ barbearia.wpp_dias_reativacao|default(45) }}" style="max-width: 120px;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar Configuracoes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="bi bi-clock-history"></i> Lembretes Recentes</h5>
+
+                    {% if lembretes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Destinatario</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for l in lembretes %}
+                                <tr>
+                                    <td><small>{{ l.enviado_em.strftime('%d/%m %H:%M') if l.enviado_em else '-' }}</small></td>
+                                    <td><span class="badge bg-info">{{ l.tipo }}</span></td>
+                                    <td><small>{{ l.agendamento.cliente.nome if l.agendamento and l.agendamento.cliente else '-' }}</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if l.status == 'enviado' else 'danger' if l.status == 'erro' else 'warning' }}">
+                                            {{ l.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-chat-dots display-4"></i>
+                        <p class="mt-2">Nenhum lembrete enviado ainda.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

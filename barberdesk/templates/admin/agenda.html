@@ -60,12 +60,18 @@
                     {% endif %}
                     <div class="btn-group btn-group-sm mt-1">
                         {% if ag.status in ['agendado', 'confirmado'] %}
-                        <a href="{{ url_for('admin.concluir_agendamento', id=ag.id) }}" class="btn btn-outline-success" title="Concluir">
-                            <i class="bi bi-check"></i>
-                        </a>
-                        <a href="{{ url_for('admin.cancelar_agendamento', id=ag.id) }}" class="btn btn-outline-danger" title="Cancelar">
-                            <i class="bi bi-x"></i>
-                        </a>
+                        <form method="POST" action="{{ url_for('admin.agenda_atualizar_status', agendamento_id=ag.id) }}" class="d-inline">
+                            <input type="hidden" name="status" value="concluido">
+                            <button type="submit" class="btn btn-outline-success" title="Concluir">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.agenda_atualizar_status', agendamento_id=ag.id) }}" class="d-inline">
+                            <input type="hidden" name="status" value="cancelado">
+                            <button type="submit" class="btn btn-outline-danger" title="Cancelar">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </form>
                         {% endif %}
                     </div>
                 </div>
@@ -84,7 +90,7 @@
 <div class="modal fade" id="modalNovoAgendamento" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin.novo_agendamento') }}">
+            <form method="POST" action="{{ url_for('admin.agenda_novo') }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Novo Agendamento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

@@ -40,7 +40,7 @@
                     </div>
                     {% endif %}
 
-                    <form method="POST" action="{{ url_for('admin.processar_pagamento', id=agendamento.id) }}">
+                    <form method="POST" action="{{ url_for('admin.agenda_atualizar_status', agendamento_id=agendamento.id) }}">
                         <div class="mb-3">
                             <label class="form-label">Forma de Pagamento</label>
                             <select name="forma" class="form-select" id="forma1">

@@ -1,0 +1,86 @@
+{% extends "components/base.html" %}
+{% block title %}Setup - Cadastrar Servicos{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <!-- Progress indicator -->
+            <div class="d-flex justify-content-center mb-4">
+                {% for i in range(1, 5) %}
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center {% if i == step %}bg-primary text-white{% elif i < step %}bg-success text-white{% else %}bg-secondary text-white{% endif %}" style="width: 36px; height: 36px; font-weight: bold;">
+                        {% if i < step %}<i class="bi bi-check"></i>{% else %}{{ i }}{% endif %}
+                    </div>
+                    {% if i < 4 %}
+                    <div style="width: 40px; height: 3px;" class="{% if i < step %}bg-success{% else %}bg-secondary opacity-25{% endif %}"></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <p class="text-center text-muted mb-4">Etapa {{ step }} de 4</p>
+
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-1"><i class="bi bi-list-check"></i> Cadastrar Servicos</h4>
+                    <p class="text-muted mb-4">Adicione os servicos oferecidos pela sua barbearia.</p>
+
+                    <form method="POST" action="{{ url_for('admin.setup', step=4) }}">
+                        <input type="hidden" name="action" value="add_servico">
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Servico *</label>
+                            <input type="text" name="nome" class="form-control" required placeholder="Ex: Corte Masculino">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Preco (R$) *</label>
+                                <input type="number" name="preco" class="form-control" step="0.01" min="0" required placeholder="0.00">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Duracao (min) *</label>
+                                <input type="number" name="duracao_minutos" class="form-control" value="30" min="5" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus"></i> Adicionar Servico
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Servicos cadastrados -->
+            {% if servicos %}
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                    <h6 class="mb-3"><i class="bi bi-list-check"></i> Servicos Cadastrados ({{ servicos|length }})</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for s in servicos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ s.nome }}</strong>
+                                <br><small class="text-muted">R$ {{ "%.2f"|format(s.preco) }} - {{ s.duracao_minutos }} min</small>
+                            </div>
+                            <span class="badge bg-success">Ativo</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('admin.setup', step=3) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <form method="POST" action="{{ url_for('admin.setup', step=4) }}" class="d-inline">
+                    <input type="hidden" name="action" value="finalizar">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Finalizar Setup
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

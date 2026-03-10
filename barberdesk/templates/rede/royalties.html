@@ -1,0 +1,123 @@
+{% extends "components/base.html" %}
+{% block title %}Royalties - {{ grupo.nome }}{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk <span class="badge bg-primary">Rede</span>
+        </a>
+        <div class="navbar-nav ms-auto flex-row gap-3">
+            <a class="nav-link" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link" href="{{ url_for('rede.listar_unidades') }}"><i class="bi bi-buildings"></i> Unidades</a>
+            <a class="nav-link" href="{{ url_for('rede.catalogo') }}"><i class="bi bi-list-check"></i> Catalogo</a>
+            <a class="nav-link active" href="{{ url_for('rede.royalties') }}"><i class="bi bi-percent"></i> Royalties</a>
+            <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-percent"></i> Royalties</h4>
+
+    <!-- Config -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h6 class="mb-0"><i class="bi bi-gear"></i> Configuracao</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="row align-items-end g-3">
+                <div class="col-auto">
+                    <label class="form-label">Percentual de Royalty (%)</label>
+                    <input type="number" name="percentual_royalty" class="form-control" step="0.1" min="0" max="100"
+                           value="{{ percentual }}" style="width: 150px;">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Salvar
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <span class="text-muted">Percentual atual: <strong>{{ percentual }}%</strong></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-cash-stack text-success fs-4"></i>
+                    <h4 class="mt-2 text-success">{{ total_receita_fmt }}</h4>
+                    <small class="text-muted">Receita Total da Rede</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-piggy-bank text-primary fs-4"></i>
+                    <h4 class="mt-2 text-primary">{{ total_royalty_fmt }}</h4>
+                    <small class="text-muted">Total de Royalties</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar3 text-info fs-4"></i>
+                    <h4 class="mt-2 text-info">{{ "%02d"|format(mes) }}/{{ ano }}</h4>
+                    <small class="text-muted">Periodo</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-table"></i> Relatorio por Unidade</h6>
+        </div>
+        <div class="card-body">
+            {% if relatorio %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Unidade</th>
+                            <th class="text-end">Receita</th>
+                            <th class="text-end">Royalty ({{ percentual }}%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in relatorio %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><strong>{{ item.barbearia.nome }}</strong></td>
+                            <td class="text-end">{{ item.receita_fmt }}</td>
+                            <td class="text-end text-primary fw-bold">{{ item.royalty_fmt }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td class="text-end"><strong>{{ total_receita_fmt }}</strong></td>
+                            <td class="text-end"><strong class="text-primary">{{ total_royalty_fmt }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center py-3 mb-0">Nenhum dado para o periodo selecionado.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

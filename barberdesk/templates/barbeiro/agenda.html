@@ -36,10 +36,10 @@
 
                     {% if ag.status in ['agendado', 'confirmado'] %}
                     <div class="d-flex gap-1">
-                        <a href="{{ url_for('barbeiro.concluir', id=ag.id) }}" class="btn btn-sm btn-success">
+                        <a href="{{ url_for('barbeiro.concluir_atendimento', agendamento_id=ag.id) }}" class="btn btn-sm btn-success">
                             <i class="bi bi-check-lg"></i> Concluir
                         </a>
-                        <a href="{{ url_for('barbeiro.cancelar', id=ag.id) }}" class="btn btn-sm btn-outline-danger">
+                        <a href="#" class="btn btn-sm btn-outline-danger" onclick="alert('Para cancelar, contate o administrador.'); return false;">
                             <i class="bi bi-x"></i>
                         </a>
                     </div>

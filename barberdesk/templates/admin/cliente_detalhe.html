@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white">
-                    <form method="POST" action="{{ url_for('admin.cliente_editar', id=cliente.id) }}">
+                    <form method="POST" action="#">
                         <div class="mb-2">
                             <label class="form-label small">Observacoes</label>
                             <textarea name="observacoes" class="form-control form-control-sm" rows="2">{{ cliente.observacoes or '' }}</textarea>

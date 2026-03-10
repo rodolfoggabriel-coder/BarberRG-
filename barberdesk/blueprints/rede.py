@@ -14,10 +14,10 @@ from flask import (
 )
 from sqlalchemy import func, case
 
-from barberdesk.models import (
+from models import (
     db, Grupo, Barbearia, Barbeiro, Agendamento, Pagamento, Comissao, Servico
 )
-from barberdesk.utils import formatar_moeda
+from utils import formatar_moeda
 
 rede_bp = Blueprint('rede', __name__, url_prefix='/rede')
 

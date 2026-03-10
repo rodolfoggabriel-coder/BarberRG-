@@ -1,0 +1,122 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Relatorio de Clientes - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-people"></i> Relatorio de Clientes</h4>
+        <a href="{{ url_for('admin.relatorios') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Filtro de periodo -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.relatorio_clientes') }}" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Mes</label>
+                    <select name="mes" class="form-select">
+                        {% for m in range(1, 13) %}
+                        <option value="{{ m }}" {% if m == mes %}selected{% endif %}>
+                            {{ ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m-1] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ano</label>
+                    <input type="number" name="ano" class="form-control" value="{{ ano }}" min="2020" max="2099">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-plus display-4 text-success"></i>
+                    <h3 class="mt-2">{{ novos }}</h3>
+                    <p class="text-muted mb-0">Novos Clientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-check display-4 text-primary"></i>
+                    <h3 class="mt-2">{{ clientes_ativos }}</h3>
+                    <p class="text-muted mb-0">Clientes Ativos no Mes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 text-info"></i>
+                    <h3 class="mt-2">{{ total_clientes }}</h3>
+                    <p class="text-muted mb-0">Total de Clientes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Clientes -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-trophy"></i> Top Clientes (Maiores Gastadores)</h5>
+
+            {% if top_clientes %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
+                            <th class="text-center">Visitas</th>
+                            <th class="text-end">Total Gasto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in top_clientes %}
+                        <tr>
+                            <td>
+                                {% if loop.index <= 3 %}
+                                <span class="badge bg-{{ 'warning' if loop.index == 1 else 'secondary' if loop.index == 2 else 'dark' }}">
+                                    {{ loop.index }}
+                                </span>
+                                {% else %}
+                                {{ loop.index }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.cliente_detalhe', cliente_id=c.id) }}" class="text-decoration-none">
+                                    <strong>{{ c.nome }}</strong>
+                                </a>
+                            </td>
+                            <td>{{ c.telefone }}</td>
+                            <td class="text-center">{{ c.visitas }}</td>
+                            <td class="text-end"><strong>{{ c.gasto }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-people display-4"></i>
+                <p class="mt-2">Nenhum dado de clientes no periodo selecionado.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

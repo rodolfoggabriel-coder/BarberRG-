@@ -1,0 +1,139 @@
+{% extends "components/base.html" %}
+{% block title %}Catalogo da Rede - {{ grupo.nome }}{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk <span class="badge bg-primary">Rede</span>
+        </a>
+        <div class="navbar-nav ms-auto flex-row gap-3">
+            <a class="nav-link" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link" href="{{ url_for('rede.listar_unidades') }}"><i class="bi bi-buildings"></i> Unidades</a>
+            <a class="nav-link active" href="{{ url_for('rede.catalogo') }}"><i class="bi bi-list-check"></i> Catalogo</a>
+            <a class="nav-link" href="{{ url_for('rede.royalties') }}"><i class="bi bi-percent"></i> Royalties</a>
+            <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4><i class="bi bi-list-check"></i> Catalogo da Rede</h4>
+            <p class="text-muted mb-0">Gerencie servicos padrao propagados para todas as unidades.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropagar">
+                <i class="bi bi-plus-lg"></i> Propagar Servico
+            </button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalRemover">
+                <i class="bi bi-trash"></i> Remover Servico
+            </button>
+        </div>
+    </div>
+
+    <!-- Services per unit -->
+    {% for u in unidades %}
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-shop"></i> {{ u.nome }}</h6>
+            <span class="badge bg-secondary">{{ servicos_por_unidade[u.id]|length }} servicos</span>
+        </div>
+        <div class="card-body">
+            {% if servicos_por_unidade[u.id] %}
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Servico</th>
+                            <th class="text-end">Preco</th>
+                            <th class="text-end">Duracao</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in servicos_por_unidade[u.id] %}
+                        <tr>
+                            <td>{{ s.nome }}</td>
+                            <td class="text-end">R$ {{ "%.2f"|format(s.preco) }}</td>
+                            <td class="text-end">{{ s.duracao_minutos }} min</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mb-0 py-2">Nenhum servico ativo nesta unidade.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal Propagar Servico -->
+<div class="modal fade" id="modalPropagar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('rede.catalogo_propagar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Propagar Servico para Todas as Unidades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">O servico sera criado em todas as unidades que ainda nao o possuem.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Servico *</label>
+                        <input type="text" name="nome" class="form-control" required placeholder="Ex: Corte Masculino">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Preco (R$) *</label>
+                            <input type="number" name="preco" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Duracao (min) *</label>
+                            <input type="number" name="duracao_minutos" class="form-control" value="30" min="5" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Propagar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Remover Servico -->
+<div class="modal fade" id="modalRemover" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('rede.catalogo_remover') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remover Servico de Todas as Unidades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">O servico sera desativado em todas as unidades da rede.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Nome exato do Servico *</label>
+                        <input type="text" name="nome" class="form-control" required placeholder="Nome do servico a remover">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Remover
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

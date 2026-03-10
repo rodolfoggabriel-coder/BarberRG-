@@ -33,8 +33,8 @@
                             <td>{{ s.creditos_plano }}</td>
                             <td><span class="badge bg-{{ 'success' if s.ativo else 'secondary' }}">{{ 'Ativo' if s.ativo else 'Inativo' }}</span></td>
                             <td>
-                                <a href="{{ url_for('admin.servico_editar', id=s.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                <a href="{{ url_for('admin.servico_toggle', id=s.id) }}" class="btn btn-sm btn-outline-{{ 'danger' if s.ativo else 'success' }}">
+                                <a href="{{ url_for('admin.servico_editar', servico_id=s.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('admin.servico_excluir', servico_id=s.id) }}" class="btn btn-sm btn-outline-{{ 'danger' if s.ativo else 'success' }}">
                                     <i class="bi bi-{{ 'pause' if s.ativo else 'play' }}"></i>
                                 </a>
                             </td>
@@ -51,7 +51,7 @@
 <div class="modal fade" id="modalNovoServico" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin.servico_criar') }}">
+            <form method="POST" action="{{ url_for('admin.servico_novo') }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Novo Servico</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

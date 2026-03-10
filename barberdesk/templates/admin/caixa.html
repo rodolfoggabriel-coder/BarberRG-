@@ -13,7 +13,7 @@
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm bg-success bg-opacity-10">
                 <div class="card-body text-center">
-                    <h4 class="text-success">R$ {{ "%.2f"|format(total_dia) }}</h4>
+                    <h4 class="text-success">{{ total_geral }}</h4>
                     <small class="text-muted">Total Faturado</small>
                 </div>
             </div>
@@ -21,7 +21,7 @@
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h4>{{ atendimentos_dia }}</h4>
+                    <h4>{{ pagamentos|length }}</h4>
                     <small class="text-muted">Atendimentos</small>
                 </div>
             </div>
@@ -29,16 +29,16 @@
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h4>R$ {{ "%.2f"|format(ticket_medio) }}</h4>
-                    <small class="text-muted">Ticket Medio</small>
+                    <h4>{{ total_comissoes }}</h4>
+                    <small class="text-muted">Comissoes</small>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h4>R$ {{ "%.2f"|format(comissoes_dia) }}</h4>
-                    <small class="text-muted">Comissoes</small>
+                    <h4>{{ lucro_liquido }}</h4>
+                    <small class="text-muted">Lucro Liquido</small>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white"><h6 class="mb-0">Por Forma de Pagamento</h6></div>
                 <div class="card-body">
-                    {% for forma, valor in por_forma.items() %}
+                    {% for forma, valor in faturamento_por_forma.items() %}
                     <div class="d-flex justify-content-between mb-2">
                         <span>
                             {% if forma == 'dinheiro' %}<i class="bi bi-cash"></i>
@@ -60,7 +60,7 @@
                             {% endif %}
                             {{ forma|replace('_', ' ')|title }}
                         </span>
-                        <strong>R$ {{ "%.2f"|format(valor) }}</strong>
+                        <strong>{{ valor }}</strong>
                     </div>
                     {% endfor %}
                 </div>
@@ -70,12 +70,12 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white"><h6 class="mb-0">Por Barbeiro</h6></div>
                 <div class="card-body">
-                    {% for b in por_barbeiro %}
+                    {% for nome, dados in resumo_barbeiros.items() %}
                     <div class="d-flex justify-content-between mb-2">
-                        <span>{{ b.nome }}</span>
+                        <span>{{ nome }}</span>
                         <div>
-                            <span class="text-muted small">{{ b.atendimentos }} atend.</span>
-                            <strong class="ms-2">R$ {{ "%.2f"|format(b.total) }}</strong>
+                            <span class="text-muted small">{{ dados.atendimentos }} atend.</span>
+                            <strong class="ms-2">R$ {{ "%.2f"|format(dados.faturamento) }}</strong>
                         </div>
                     </div>
                     {% endfor %}

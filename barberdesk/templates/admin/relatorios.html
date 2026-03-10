@@ -1,0 +1,84 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Relatorios - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-bar-chart"></i> Relatorios</h4>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.relatorio_faturamento') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-graph-up-arrow display-4 text-success"></i>
+                        <h5 class="mt-3">Faturamento</h5>
+                        <p class="text-muted small">Receitas por dia, forma de pagamento, barbeiro e servico.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.relatorio_barbeiros') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-person-badge display-4 text-primary"></i>
+                        <h5 class="mt-3">Barbeiros</h5>
+                        <p class="text-muted small">Desempenho, atendimentos, faturamento e notas por barbeiro.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.relatorio_clientes') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-people display-4 text-info"></i>
+                        <h5 class="mt-3">Clientes</h5>
+                        <p class="text-muted small">Novos clientes, ativos, inativos e maiores gastadores.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.financeiro') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-wallet2 display-4 text-warning"></i>
+                        <h5 class="mt-3">Financeiro</h5>
+                        <p class="text-muted small">DRE simplificado, despesas e lucro liquido.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.comissoes') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-percent display-4 text-danger"></i>
+                        <h5 class="mt-3">Comissoes</h5>
+                        <p class="text-muted small">Comissoes pendentes e pagas por barbeiro.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{{ url_for('admin.exportar_pdf') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-file-pdf display-4 text-secondary"></i>
+                        <h5 class="mt-3">Exportar PDF</h5>
+                        <p class="text-muted small">Gere relatorios em PDF para impressao ou envio.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -66,7 +66,7 @@
 <div class="modal fade" id="modalDefinirMeta" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin.meta_criar') }}">
+            <form method="POST" action="#" id="formMeta">
                 <div class="modal-header">
                     <h5 class="modal-title">Definir Meta Mensal</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -74,9 +74,9 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Barbeiro</label>
-                        <select name="barbeiro_id" class="form-select">
+                        <select name="barbeiro_id" class="form-select" id="selectBarbeiroMeta" onchange="atualizarActionMeta()">
                             {% for b in barbeiros %}
-                            <option value="{{ b.id }}">{{ b.nome }}</option>
+                            <option value="{{ b.id }}" data-url="{{ url_for('admin.barbeiro_metas', barbeiro_id=b.id) }}">{{ b.nome }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -115,4 +115,15 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function atualizarActionMeta() {
+    var sel = document.getElementById('selectBarbeiroMeta');
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('formMeta').action = opt.dataset.url;
+}
+document.addEventListener('DOMContentLoaded', atualizarActionMeta);
+</script>
 {% endblock %}

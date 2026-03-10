@@ -1,0 +1,121 @@
+{% extends "components/base.html" %}
+{% block title %}Escolha a Data - {{ barbearia.nome }}{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('public.agendar', slug=barbearia.slug) }}">
+            <i class="bi bi-scissors"></i> {{ barbearia.nome }}
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <!-- Progress -->
+    <div class="d-flex justify-content-center mb-4">
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">1. Servico</span>
+        <span class="badge bg-success rounded-pill px-3 py-2 me-2">2. Barbeiro</span>
+        <span class="badge bg-primary rounded-pill px-3 py-2 me-2">3. Data</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2">4. Horario</span>
+    </div>
+
+    <p class="text-muted mb-1">Servico selecionado:</p>
+    <h5 class="mb-1">{{ servico.nome }} <small class="text-primary">R$ {{ "%.2f"|format(servico.preco) }}</small></h5>
+    {% if barbeiro %}
+    <p class="text-muted">Barbeiro: <strong>{{ barbeiro.nome }}</strong></p>
+    {% else %}
+    <p class="text-muted">Barbeiro: <strong>Qualquer disponivel</strong></p>
+    {% endif %}
+
+    <h4 class="mb-3 mt-4"><i class="bi bi-calendar3"></i> Escolha a Data</h4>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="row g-2 justify-content-center" id="dias-grid">
+                {% set today = import('datetime').date.today() if false %}
+            </div>
+            <div class="mt-3">
+                <label class="form-label text-muted">Ou selecione no calendario:</label>
+                <input type="date" id="data-picker" class="form-control form-control-lg text-center"
+                       min="{{ import('datetime').date.today().isoformat() if false }}">
+            </div>
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-primary btn-lg px-5" id="btn-continuar" disabled onclick="irParaHorario()">
+                    <i class="bi bi-arrow-right"></i> Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ url_for('public.agendar_barbeiro', slug=barbearia.slug, servico_id=servico.id) }}" class="btn btn-outline-secondary mt-3">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const slug = "{{ barbearia.slug }}";
+const servicoId = {{ servico.id }};
+const barbeiroId = {{ barbeiro_id }};
+let dataSelecionada = null;
+
+const picker = document.getElementById('data-picker');
+const btnContinuar = document.getElementById('btn-continuar');
+
+// Set min date to today
+const hoje = new Date();
+const hojeStr = hoje.toISOString().split('T')[0];
+picker.setAttribute('min', hojeStr);
+
+picker.addEventListener('change', function() {
+    dataSelecionada = this.value;
+    btnContinuar.disabled = false;
+});
+
+function irParaHorario() {
+    if (!dataSelecionada) return;
+    const url = `/agendar/${slug}/horario?servico_id=${servicoId}&barbeiro_id=${barbeiroId}&data=${dataSelecionada}`;
+    window.location.href = url;
+}
+
+// Generate next 14 days as quick-select buttons
+const grid = document.getElementById('dias-grid');
+const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+const diasFuncionamento = {{ dias_funcionamento | tojson }};
+
+for (let i = 0; i < 14; i++) {
+    const d = new Date(hoje);
+    d.setDate(d.getDate() + i);
+    const dStr = d.toISOString().split('T')[0];
+    const diaSemana = d.getDay();
+    const funciona = diasFuncionamento.length === 0 || diasFuncionamento.includes(diaSemana);
+
+    const col = document.createElement('div');
+    col.className = 'col-auto';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = funciona ? 'btn btn-outline-primary text-center px-3 py-2' : 'btn btn-outline-secondary text-center px-3 py-2 disabled';
+    btn.innerHTML = `<small class="d-block">${diasSemana[diaSemana]}</small><strong>${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}</strong>`;
+
+    if (funciona) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#dias-grid .btn').forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-primary');
+            });
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+            dataSelecionada = dStr;
+            picker.value = dStr;
+            btnContinuar.disabled = false;
+        });
+    }
+    col.appendChild(btn);
+    grid.appendChild(col);
+}
+</script>
+{% endblock %}

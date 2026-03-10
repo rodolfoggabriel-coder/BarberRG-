@@ -1,0 +1,56 @@
+{% extends "components/base.html" %}
+{% block title %}Escolha o Servico - {{ barbearia.nome }}{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('public.agendar', slug=barbearia.slug) }}">
+            <i class="bi bi-scissors"></i> {{ barbearia.nome }}
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <!-- Progress -->
+    <div class="d-flex justify-content-center mb-4">
+        <span class="badge bg-primary rounded-pill px-3 py-2 me-2">1. Servico</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2 me-2">2. Barbeiro</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2 me-2">3. Data</span>
+        <span class="badge bg-secondary rounded-pill px-3 py-2">4. Horario</span>
+    </div>
+
+    <h4 class="mb-3"><i class="bi bi-list-check"></i> Escolha o Servico</h4>
+
+    {% if servicos %}
+    <div class="row g-3">
+        {% for servico in servicos %}
+        <div class="col-12 col-md-6">
+            <a href="{{ url_for('public.agendar_barbeiro', slug=barbearia.slug, servico_id=servico.id) }}"
+               class="card text-decoration-none border-0 shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">{{ servico.nome }}</h6>
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> {{ servico.duracao_minutos }} min
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-5 fw-bold text-primary">R$ {{ "%.2f"|format(servico.preco) }}</span>
+                        <br>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-emoji-frown display-1 text-muted"></i>
+        <p class="text-muted mt-3">Nenhum servico disponivel no momento.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

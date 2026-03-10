@@ -5,11 +5,11 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 
-from barberdesk.models import (
+from models import (
     db, Barbeiro, Agendamento, Pagamento, Comissao,
     Servico, Cliente, Avaliacao, PortfolioFoto, MetaBarbeiro
 )
-from barberdesk.utils import calcular_comissao, calcular_hora_fim
+from utils import calcular_comissao, calcular_hora_fim
 
 barbeiro_bp = Blueprint('barbeiro', __name__, url_prefix='/barbeiro')
 

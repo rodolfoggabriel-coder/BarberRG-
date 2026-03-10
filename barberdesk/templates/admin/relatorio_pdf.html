@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatorio - {{ barbearia.nome }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #333; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { font-size: 20px; margin-bottom: 5px; }
+        .header p { font-size: 11px; color: #666; }
+        .section { margin-bottom: 20px; }
+        .section h2 { font-size: 14px; background: #f0f0f0; padding: 6px 10px; margin-bottom: 10px; border-left: 4px solid #333; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f8f8; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .summary-box { display: inline-block; width: 30%; text-align: center; padding: 10px; margin: 5px 1%; background: #f8f8f8; border: 1px solid #ddd; }
+        .summary-box .value { font-size: 18px; font-weight: bold; }
+        .summary-box .label { font-size: 10px; color: #666; text-transform: uppercase; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 10px; color: #999; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 8px 20px; font-size: 14px; cursor: pointer; background: #333; color: #fff; border: none; border-radius: 4px;">
+            Imprimir / Salvar PDF
+        </button>
+        <button onclick="window.history.back()" style="padding: 8px 20px; font-size: 14px; cursor: pointer; background: #999; color: #fff; border: none; border-radius: 4px; margin-left: 10px;">
+            Voltar
+        </button>
+    </div>
+
+    <div class="header">
+        <h1>{{ barbearia.nome }}</h1>
+        <p>Relatorio de {{ tipo|capitalize if tipo else 'Faturamento' }}</p>
+        <p>Periodo: {{ data_inicio.strftime('%d/%m/%Y') }} a {{ data_fim.strftime('%d/%m/%Y') }}</p>
+    </div>
+
+    <!-- Resumo -->
+    <div class="section">
+        <h2>Resumo Geral</h2>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div class="summary-box">
+                <div class="value">{{ total_faturamento }}</div>
+                <div class="label">Faturamento</div>
+            </div>
+            <div class="summary-box">
+                <div class="value">{{ total_atendimentos }}</div>
+                <div class="label">Atendimentos</div>
+            </div>
+            <div class="summary-box">
+                <div class="value">{{ lucro_liquido }}</div>
+                <div class="label">Lucro Liquido</div>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <td>Faturamento Bruto</td>
+                <td class="text-right"><strong>{{ total_faturamento }}</strong></td>
+            </tr>
+            <tr>
+                <td>(-) Comissoes</td>
+                <td class="text-right">{{ total_comissoes }}</td>
+            </tr>
+            <tr>
+                <td>(-) Despesas</td>
+                <td class="text-right">{{ total_despesas }}</td>
+            </tr>
+            <tr style="border-top: 2px solid #333;">
+                <td><strong>Lucro Liquido</strong></td>
+                <td class="text-right"><strong>{{ lucro_liquido }}</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Por Forma de Pagamento -->
+    {% if por_forma %}
+    <div class="section">
+        <h2>Faturamento por Forma de Pagamento</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Forma</th>
+                    <th class="text-right">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for forma, valor in por_forma.items() %}
+                <tr>
+                    <td>{{ forma|capitalize }}</td>
+                    <td class="text-right">{{ valor }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Por Barbeiro -->
+    {% if por_barbeiro %}
+    <div class="section">
+        <h2>Faturamento por Barbeiro</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Barbeiro</th>
+                    <th class="text-center">Atendimentos</th>
+                    <th class="text-right">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nome, dados in por_barbeiro.items() %}
+                <tr>
+                    <td>{{ nome }}</td>
+                    <td class="text-center">{{ dados.atendimentos }}</td>
+                    <td class="text-right">R$ {{ "%.2f"|format(dados.valor) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Despesas -->
+    {% if despesas %}
+    <div class="section">
+        <h2>Despesas do Periodo</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Descricao</th>
+                    <th>Categoria</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-right">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in despesas %}
+                <tr>
+                    <td>{{ d.descricao }}</td>
+                    <td>{{ d.categoria|capitalize }}</td>
+                    <td class="text-center">{{ 'Pago' if d.pago else 'Pendente' }}</td>
+                    <td class="text-right">R$ {{ "%.2f"|format(d.valor) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>Gerado pelo BarberDesk em {{ now().strftime('%d/%m/%Y %H:%M') if now is defined else '' }}</p>
+        <p>{{ barbearia.nome }}{% if barbearia.endereco %} - {{ barbearia.endereco }}{% endif %}</p>
+    </div>
+</body>
+</html>

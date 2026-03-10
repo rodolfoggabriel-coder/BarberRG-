@@ -1,0 +1,36 @@
+{% extends "components/base.html" %}
+{% block title %}Login Rede - BarberDesk{% endblock %}
+{% block body_class %}bg-dark{% endblock %}
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-10 col-md-4">
+        <div class="card shadow border-0 bg-dark text-white border-secondary">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-buildings display-3 text-primary"></i>
+                    <h3 class="mt-2">BarberDesk</h3>
+                    <p class="text-muted">Painel da Rede / Franquia</p>
+                </div>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email</label>
+                        <input type="email" name="email" class="form-control form-control-lg bg-dark text-white border-secondary"
+                               required autofocus placeholder="franqueador@email.com">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-light">Senha</label>
+                        <input type="password" name="senha" class="form-control form-control-lg bg-dark text-white border-secondary"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}

@@ -10,7 +10,7 @@
         </a>
         <div class="navbar-nav ms-auto">
             <a class="nav-link" href="{{ url_for('rede.relatorios') }}"><i class="bi bi-bar-chart"></i> Relatorios</a>
-            <a class="nav-link" href="{{ url_for('rede.cardapio') }}"><i class="bi bi-list-check"></i> Cardapio</a>
+            <a class="nav-link" href="{{ url_for('rede.catalogo') }}"><i class="bi bi-list-check"></i> Cardapio</a>
             <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
         </div>
     </div>
@@ -88,7 +88,7 @@
                     {% endif %}
                 </div>
                 <div class="card-footer bg-white">
-                    <a href="{{ url_for('rede.ver_unidade', id=u.id) }}" class="btn btn-sm btn-outline-primary w-100">Ver Painel</a>
+                    <a href="{{ url_for('rede.ver_unidade', barbearia_id=u.id) }}" class="btn btn-sm btn-outline-primary w-100">Ver Painel</a>
                 </div>
             </div>
         </div>

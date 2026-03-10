@@ -64,7 +64,7 @@
 <div class="modal fade" id="modalNovoProduto" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin.produto_criar') }}">
+            <form method="POST" action="{{ url_for('admin.produto_novo') }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Novo Produto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -115,7 +115,7 @@
 <div class="modal fade" id="modalMovimentar" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin.movimentar_estoque') }}">
+            <form method="POST" action="#" id="formMovimentar">
                 <div class="modal-header">
                     <h5 class="modal-title">Movimentar Estoque</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -153,8 +153,10 @@
 <script>
 document.getElementById('modalMovimentar').addEventListener('show.bs.modal', function(e) {
     const btn = e.relatedTarget;
-    document.getElementById('mov-produto-id').value = btn.dataset.produtoId;
+    const produtoId = btn.dataset.produtoId;
+    document.getElementById('mov-produto-id').value = produtoId;
     document.getElementById('mov-produto-nome').textContent = btn.dataset.produtoNome;
+    document.getElementById('formMovimentar').action = '/admin/produtos/' + produtoId + '/movimentar';
 });
 </script>
 {% endblock %}

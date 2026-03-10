@@ -1,0 +1,86 @@
+{% extends "components/admin_base.html" %}
+{% block title %}{{ 'Editar' if barbeiro else 'Novo' }} Barbeiro - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>
+            <i class="bi bi-person-badge"></i>
+            {{ 'Editar Barbeiro' if barbeiro else 'Novo Barbeiro' }}
+        </h4>
+        <a href="{{ url_for('admin.barbeiros') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.barbeiro_editar', barbeiro_id=barbeiro.id) if barbeiro else url_for('admin.barbeiro_novo') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Nome *</label>
+                            <input type="text" name="nome" class="form-control" value="{{ barbeiro.nome if barbeiro else '' }}" required placeholder="Nome do barbeiro">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Telefone *</label>
+                            <input type="tel" name="telefone" class="form-control" value="{{ barbeiro.telefone if barbeiro else '' }}" required placeholder="(11) 99999-9999">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">PIN de acesso (4 digitos) {{ '*' if not barbeiro else '' }}</label>
+                            <input type="text" name="pin" class="form-control" maxlength="4" pattern="\d{4}" {{ 'required' if not barbeiro else '' }} placeholder="{{ 'Deixe em branco para manter o atual' if barbeiro else '1234' }}">
+                            {% if barbeiro %}
+                            <small class="text-muted">Deixe em branco para manter o PIN atual.</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">% Comissao</label>
+                            <input type="number" name="percentual_comissao" class="form-control" value="{{ barbeiro.percentual_comissao if barbeiro else 50 }}" min="0" max="100" step="0.1">
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="comissao_sobre_liquido" id="comissao_liquido"
+                                {% if barbeiro and barbeiro.comissao_sobre_liquido %}checked{% endif %}>
+                            <label class="form-check-label" for="comissao_liquido">
+                                Comissao sobre valor liquido (pos-desconto)
+                            </label>
+                        </div>
+
+                        {% if barbeiro %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo"
+                                {% if barbeiro.ativo %}checked{% endif %}>
+                            <label class="form-check-label" for="ativo">Ativo</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.barbeiros') }}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ 'Salvar Alteracoes' if barbeiro else 'Cadastrar' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if barbeiro %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Zona de Perigo</h6>
+                    <p class="text-muted small">Desativar o barbeiro impedira novos agendamentos.</p>
+                    <form method="POST" action="{{ url_for('admin.barbeiro_excluir', barbeiro_id=barbeiro.id) }}" onsubmit="return confirm('Tem certeza que deseja desativar este barbeiro?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-person-x"></i> Desativar Barbeiro
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

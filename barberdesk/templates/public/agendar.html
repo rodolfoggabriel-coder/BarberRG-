@@ -116,7 +116,7 @@
         </div>
 
         <!-- Dados do cliente -->
-        <form method="POST" action="{{ url_for('public.confirmar_agendamento') }}" id="form-agendar" class="mt-4" style="display: none;">
+        <form method="POST" action="{{ url_for('public.agendar_confirmar', slug=barbearia.slug) }}" id="form-agendar" class="mt-4" style="display: none;">
             <input type="hidden" name="servico_id" value="{{ servico_id }}">
             <input type="hidden" name="barbeiro_id" value="{{ barbeiro_id }}">
             <input type="hidden" name="data" value="{{ data }}">

@@ -1,0 +1,117 @@
+{% extends "components/admin_base.html" %}
+{% block title %}{{ 'Editar' if plano else 'Novo' }} Plano - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>
+            <i class="bi bi-credit-card"></i>
+            {{ 'Editar Plano' if plano else 'Novo Plano' }}
+        </h4>
+        <a href="{{ url_for('admin.planos') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.plano_editar', plano_id=plano.id) if plano else url_for('admin.plano_novo') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Plano *</label>
+                            <input type="text" name="nome" class="form-control" value="{{ plano.nome if plano else '' }}" required placeholder="Ex: Plano Mensal Premium">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Preco Mensal (R$) *</label>
+                            <input type="number" name="preco_mensal" class="form-control" step="0.01" min="0" value="{{ '%.2f'|format(plano.preco_mensal) if plano else '' }}" required placeholder="0.00">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descricao</label>
+                            <textarea name="descricao" class="form-control" rows="2" placeholder="Descricao do plano para o cliente">{{ plano.descricao if plano and plano.descricao else '' }}</textarea>
+                        </div>
+
+                        <hr>
+                        <h6 class="mb-3"><i class="bi bi-ticket-perforated"></i> Creditos Mensais por Servico</h6>
+                        <p class="text-muted small">Defina quantos creditos o assinante recebe por mes para cada servico.</p>
+
+                        {% set creditos_atuais = plano.get_creditos_mensais() if plano and plano.get_creditos_mensais is defined else {} %}
+                        {% for s in servicos %}
+                        <div class="row mb-2 align-items-center">
+                            <div class="col-8">
+                                <label class="form-label mb-0">{{ s.nome }}</label>
+                                <small class="text-muted d-block">R$ {{ "%.2f"|format(s.preco) }}</small>
+                            </div>
+                            <div class="col-4">
+                                <input type="number" name="creditos_{{ s.id }}" class="form-control" min="0" value="{{ creditos_atuais.get(s.nome, 0) }}" placeholder="0">
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% if not servicos %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhum servico cadastrado. Cadastre servicos primeiro.
+                        </div>
+                        {% endif %}
+
+                        <hr>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="creditos_expiram" id="creditos_expiram"
+                                {% if plano and plano.creditos_expiram %}checked{% endif %}>
+                            <label class="form-check-label" for="creditos_expiram">
+                                Creditos expiram ao final do mes
+                            </label>
+                        </div>
+
+                        {% if plano %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="ativo" id="ativo"
+                                {% if plano.ativo %}checked{% endif %}>
+                            <label class="form-check-label" for="ativo">Ativo</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.planos') }}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ 'Salvar Alteracoes' if plano else 'Cadastrar' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if plano and assinantes is defined and assinantes %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-people"></i> Assinantes ({{ assinantes|length }})</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Status</th>
+                                    <th>Inicio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in assinantes %}
+                                <tr>
+                                    <td>{{ a.cliente.nome }}</td>
+                                    <td><span class="badge bg-{{ 'success' if a.status == 'ativo' else 'secondary' }}">{{ a.status }}</span></td>
+                                    <td>{{ a.data_inicio.strftime('%d/%m/%Y') if a.data_inicio else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
