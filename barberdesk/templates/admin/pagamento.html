@@ -1,0 +1,111 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Fechamento - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Fechamento de Atendimento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="bg-light rounded p-3 mb-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Cliente</small>
+                                <div><strong>{{ agendamento.cliente.nome }}</strong></div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Barbeiro</small>
+                                <div><strong>{{ agendamento.barbeiro.nome }}</strong></div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <small class="text-muted">Servico</small>
+                                <div><strong>{{ agendamento.servico.nome }}</strong></div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Valor</small>
+                                <div><strong class="text-primary fs-5">R$ {{ "%.2f"|format(agendamento.valor) }}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if pontos_disponiveis > 0 %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-star-fill text-warning"></i> Cliente tem <strong>{{ pontos_disponiveis }}</strong> pontos.
+                        Desconto disponivel: <strong>R$ {{ "%.2f"|format(desconto_disponivel) }}</strong>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('admin.processar_pagamento', id=agendamento.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Forma de Pagamento</label>
+                            <select name="forma" class="form-select" id="forma1">
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="pix">Pix</option>
+                                <option value="cartao_debito">Cartao de Debito</option>
+                                <option value="cartao_credito">Cartao de Credito</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Valor Pago</label>
+                            <input type="number" name="valor_pago" class="form-control" step="0.01" value="{{ agendamento.valor }}" required>
+                        </div>
+
+                        <!-- Split payment -->
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="split-toggle" onchange="document.getElementById('split-fields').classList.toggle('d-none')">
+                            <label class="form-check-label">Split de pagamento (duas formas)</label>
+                        </div>
+
+                        <div id="split-fields" class="d-none mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Segunda Forma</label>
+                                    <select name="forma2" class="form-select">
+                                        <option value="">-</option>
+                                        <option value="dinheiro">Dinheiro</option>
+                                        <option value="pix">Pix</option>
+                                        <option value="cartao_debito">Cartao de Debito</option>
+                                        <option value="cartao_credito">Cartao de Credito</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Valor 2</label>
+                                    <input type="number" name="valor2" class="form-control" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if pontos_disponiveis > 0 %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="usar_fidelidade">
+                            <label class="form-check-label">Aplicar desconto de fidelidade (R$ {{ "%.2f"|format(desconto_disponivel) }})</label>
+                        </div>
+                        {% endif %}
+
+                        <!-- Venda de produto -->
+                        <div class="mb-3">
+                            <label class="form-label">Adicionar produto (opcional)</label>
+                            <select name="produto_id" class="form-select">
+                                <option value="">Nenhum</option>
+                                {% for p in produtos %}
+                                <option value="{{ p.id }}">{{ p.nome }} - R$ {{ "%.2f"|format(p.preco_venda) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2">
+                            <i class="bi bi-check-circle"></i> Confirmar Pagamento
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

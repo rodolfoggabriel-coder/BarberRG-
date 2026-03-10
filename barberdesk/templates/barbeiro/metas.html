@@ -1,0 +1,76 @@
+{% extends "components/barbeiro_base.html" %}
+{% block title %}Minhas Metas - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="pt-4">
+    <h5 class="mb-3"><i class="bi bi-trophy"></i> Minhas Metas</h5>
+
+    {% if meta %}
+    <!-- Atendimentos -->
+    <div class="card bg-dark border-secondary mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <h6><i class="bi bi-calendar-check"></i> Atendimentos</h6>
+                <span>{{ atendimentos_atual }}/{{ meta.meta_atendimentos }}</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+                <div class="progress-bar {{ 'bg-success' if progresso_atend >= 100 else 'bg-primary' }}" style="width: {{ [progresso_atend, 100]|min }}%">
+                    {{ progresso_atend }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faturamento -->
+    <div class="card bg-dark border-secondary mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <h6><i class="bi bi-cash-coin"></i> Faturamento</h6>
+                <span>R$ {{ "%.0f"|format(faturamento_atual) }}/R$ {{ "%.0f"|format(meta.meta_faturamento) }}</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+                <div class="progress-bar {{ 'bg-success' if progresso_fat >= 100 else 'bg-warning' }}" style="width: {{ [progresso_fat, 100]|min }}%">
+                    {{ progresso_fat }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nota -->
+    <div class="card bg-dark border-secondary mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <h6><i class="bi bi-star"></i> Nota Media</h6>
+                <span>{{ "%.1f"|format(nota_media) }} / {{ meta.meta_nota_minima }}</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+                <div class="progress-bar {{ 'bg-success' if nota_media >= meta.meta_nota_minima else 'bg-danger' }}" style="width: {{ [(nota_media / 5 * 100), 100]|min }}%">
+                    {{ "%.1f"|format(nota_media) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if meta.bonus_valor > 0 %}
+    <div class="card bg-dark border-success mb-3">
+        <div class="card-body text-center">
+            <h6 class="text-success">Bonus por meta batida</h6>
+            <h3 class="text-success">
+                {% if meta.bonus_tipo == 'fixo' %}
+                R$ {{ "%.2f"|format(meta.bonus_valor) }}
+                {% else %}
+                {{ meta.bonus_valor }}% adicional
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-bullseye display-1 text-muted"></i>
+        <p class="text-muted mt-3">Nenhuma meta definida para este mes.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

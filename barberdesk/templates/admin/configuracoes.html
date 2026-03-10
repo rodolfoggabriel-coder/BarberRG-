@@ -1,0 +1,155 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Configuracoes - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-sliders"></i> Configuracoes</h4>
+
+    <div class="row g-4">
+        <!-- Dados da barbearia -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-shop"></i> Dados da Barbearia</h6></div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                        <input type="hidden" name="secao" value="dados">
+                        <div class="mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" name="nome" class="form-control" value="{{ barbearia.nome }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" name="telefone" class="form-control" value="{{ barbearia.telefone }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Endereco</label>
+                            <input type="text" name="endereco" class="form-control" value="{{ barbearia.endereco }}">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Abertura</label>
+                                <input type="time" name="abertura" class="form-control" value="{{ barbearia.horario_abertura }}">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Fechamento</label>
+                                <input type="time" name="fechamento" class="form-control" value="{{ barbearia.horario_fechamento }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cancelamento minimo (horas)</label>
+                            <input type="number" name="cancelamento_horas" class="form-control" value="{{ barbearia.cancelamento_horas_minimo }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp</h6></div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                        <input type="hidden" name="secao" value="whatsapp">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_confirmacao" {{ 'checked' if barbearia.wpp_confirmacao }}>
+                            <label class="form-check-label">Confirmacao de agendamento</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_lembrete_24h" {{ 'checked' if barbearia.wpp_lembrete_24h }}>
+                            <label class="form-check-label">Lembrete 24h antes</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_lembrete_1h" {{ 'checked' if barbearia.wpp_lembrete_1h }}>
+                            <label class="form-check-label">Lembrete 1h antes</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_pos_atendimento" {{ 'checked' if barbearia.wpp_pos_atendimento }}>
+                            <label class="form-check-label">Pos-atendimento</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_avaliacao" {{ 'checked' if barbearia.wpp_avaliacao }}>
+                            <label class="form-check-label">Avaliacao</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="wpp_aniversario" {{ 'checked' if barbearia.wpp_aniversario }}>
+                            <label class="form-check-label">Aniversario</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="wpp_reativacao" {{ 'checked' if barbearia.wpp_reativacao }}>
+                            <label class="form-check-label">Reativacao de inativos</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Dias para reativacao</label>
+                            <input type="number" name="wpp_dias_reativacao" class="form-control form-control-sm" value="{{ barbearia.wpp_dias_reativacao }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fidelidade -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-star"></i> Programa de Fidelidade</h6></div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.salvar_configuracoes') }}">
+                        <input type="hidden" name="secao" value="fidelidade">
+                        {% set config_fid = barbearia.get_config_fidelidade() %}
+                        <div class="mb-3">
+                            <label class="form-label">Pontos por real gasto</label>
+                            <input type="number" name="pontos_por_real" class="form-control" value="{{ config_fid.pontos_por_real }}" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Pontos para desconto</label>
+                            <input type="number" name="pontos_para_desconto" class="form-control" value="{{ config_fid.pontos_para_desconto }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor do desconto (R$)</label>
+                            <input type="number" name="valor_desconto" class="form-control" step="0.01" value="{{ config_fid.valor_desconto }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Validade dos pontos (dias)</label>
+                            <input type="number" name="validade_dias" class="form-control" value="{{ config_fid.validade_dias }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Link publico -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-link-45deg"></i> Links Publicos</h6></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Agendamento Online</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ request.host_url }}agendar/{{ barbearia.slug }}" readonly id="link-agendar">
+                            <button class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('link-agendar').value)">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ranking (TV)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ request.host_url }}ranking/{{ barbearia.slug }}" readonly id="link-ranking">
+                            <button class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('link-ranking').value)">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Plano Atual</label>
+                        <span class="badge bg-primary fs-6">{{ barbearia.plano|upper }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

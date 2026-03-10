@@ -1,0 +1,161 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Dashboard - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
+        <span class="text-muted">{{ hoje }}</span>
+    </div>
+
+    <!-- Cards resumo -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-check display-6 text-primary"></i>
+                    <h3 class="mt-2 mb-0">{{ agendamentos_hoje }}</h3>
+                    <small class="text-muted">Agendamentos Hoje</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle display-6 text-success"></i>
+                    <h3 class="mt-2 mb-0">{{ concluidos_hoje }}</h3>
+                    <small class="text-muted">Concluidos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-cash-coin display-6 text-warning"></i>
+                    <h3 class="mt-2 mb-0">R$ {{ "%.2f"|format(faturamento_hoje) }}</h3>
+                    <small class="text-muted">Faturamento Hoje</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-percent display-6 text-danger"></i>
+                    <h3 class="mt-2 mb-0">R$ {{ "%.2f"|format(comissoes_pendentes) }}</h3>
+                    <small class="text-muted">Comissoes Pendentes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agenda do dia -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-calendar3"></i> Agenda de Hoje</h5>
+            <a href="{{ url_for('admin.agenda') }}" class="btn btn-sm btn-outline-primary">Ver completa</a>
+        </div>
+        <div class="card-body">
+            {% if agendamentos_lista %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Horario</th>
+                            <th>Cliente</th>
+                            <th>Barbeiro</th>
+                            <th>Servico</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ag in agendamentos_lista %}
+                        <tr>
+                            <td><strong>{{ ag.hora_inicio }}</strong> - {{ ag.hora_fim }}</td>
+                            <td>{{ ag.cliente.nome }}</td>
+                            <td>{{ ag.barbeiro.nome }}</td>
+                            <td>{{ ag.servico.nome }}</td>
+                            <td>
+                                {% if ag.status == 'agendado' %}
+                                <span class="badge bg-primary">Agendado</span>
+                                {% elif ag.status == 'confirmado' %}
+                                <span class="badge bg-info">Confirmado</span>
+                                {% elif ag.status == 'concluido' %}
+                                <span class="badge bg-success">Concluido</span>
+                                {% elif ag.status == 'cancelado' %}
+                                <span class="badge bg-danger">Cancelado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center py-4">Nenhum agendamento para hoje.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Linha 3: Resumos -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-trophy"></i> Top Servicos do Mes</h6></div>
+                <div class="card-body">
+                    {% for s in top_servicos %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ s.nome }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ s.total }}</span>
+                    </div>
+                    {% else %}
+                    <p class="text-muted small">Sem dados ainda.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-star"></i> Barbeiro Destaque</h6></div>
+                <div class="card-body">
+                    {% if barbeiro_destaque %}
+                    <div class="text-center">
+                        <i class="bi bi-person-circle display-4 text-primary"></i>
+                        <h5 class="mt-2">{{ barbeiro_destaque.nome }}</h5>
+                        <p class="text-muted">{{ barbeiro_destaque.atendimentos }} atendimentos este mes</p>
+                    </div>
+                    {% else %}
+                    <p class="text-muted small">Sem dados ainda.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Alertas</h6></div>
+                <div class="card-body">
+                    {% for alerta in alertas %}
+                    <div class="alert alert-{{ alerta.tipo }} py-2 mb-2 small">
+                        <i class="bi bi-{{ alerta.icone }}"></i> {{ alerta.mensagem }}
+                    </div>
+                    {% else %}
+                    <p class="text-success small"><i class="bi bi-check-circle"></i> Tudo certo!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link publico -->
+    <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="mb-1">Link de Agendamento Online</h6>
+                <code id="link-agendamento">{{ request.host_url }}agendar/{{ barbearia.slug }}</code>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('link-agendamento').textContent)">
+                <i class="bi bi-clipboard"></i> Copiar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Financeiro - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-graph-up"></i> Financeiro</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovaDespesa">
+            <i class="bi bi-plus"></i> Nova Despesa
+        </button>
+    </div>
+
+    <!-- DRE Simplificado -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">DRE Simplificado - {{ mes_nome }}</h5>
+                <div class="d-flex gap-2">
+                    <a href="?mes={{ mes_anterior }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+                    <a href="?mes={{ mes_proximo }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row text-center mb-4">
+                <div class="col">
+                    <h3 class="text-success">R$ {{ "%.2f"|format(receita_bruta) }}</h3>
+                    <small class="text-muted">Receita Bruta</small>
+                </div>
+                <div class="col"><h3 class="text-muted">-</h3></div>
+                <div class="col">
+                    <h3 class="text-warning">R$ {{ "%.2f"|format(descontos) }}</h3>
+                    <small class="text-muted">Descontos</small>
+                </div>
+                <div class="col"><h3 class="text-muted">-</h3></div>
+                <div class="col">
+                    <h3 class="text-info">R$ {{ "%.2f"|format(comissoes_total) }}</h3>
+                    <small class="text-muted">Comissoes</small>
+                </div>
+                <div class="col"><h3 class="text-muted">-</h3></div>
+                <div class="col">
+                    <h3 class="text-danger">R$ {{ "%.2f"|format(despesas_total) }}</h3>
+                    <small class="text-muted">Despesas</small>
+                </div>
+                <div class="col"><h3 class="text-muted">=</h3></div>
+                <div class="col">
+                    <h3 class="{{ 'text-success' if lucro >= 0 else 'text-danger' }}">R$ {{ "%.2f"|format(lucro) }}</h3>
+                    <small class="text-muted">Lucro Real</small>
+                </div>
+            </div>
+
+            {% if ponto_equilibrio > 0 %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                Ponto de equilibrio: <strong>{{ ponto_equilibrio }} atendimentos/dia</strong> para cobrir despesas fixas.
+                {% if media_atendimentos > 0 %}
+                Voce faz em media <strong>{{ media_atendimentos }}/dia</strong>.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Despesas -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white"><h5 class="mb-0">Despesas do Mes</h5></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Descricao</th>
+                            <th>Categoria</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Pago</th>
+                            <th>Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in despesas %}
+                        <tr>
+                            <td>{{ d.descricao }}</td>
+                            <td><span class="badge bg-secondary">{{ d.categoria or '-' }}</span></td>
+                            <td>{{ d.tipo|title }}</td>
+                            <td>R$ {{ "%.2f"|format(d.valor) }}</td>
+                            <td>{{ d.data_vencimento.strftime('%d/%m') if d.data_vencimento else '-' }}</td>
+                            <td>
+                                {% if d.pago %}
+                                <span class="badge bg-success">Pago</span>
+                                {% else %}
+                                <a href="{{ url_for('admin.despesa_pagar', id=d.id) }}" class="badge bg-warning text-dark text-decoration-none">Pendente</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.despesa_deletar', id=d.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deletar?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Despesa -->
+<div class="modal fade" id="modalNovaDespesa" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.despesa_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Despesa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Descricao *</label>
+                        <input type="text" name="descricao" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Categoria</label>
+                            <select name="categoria" class="form-select">
+                                <option value="aluguel">Aluguel</option>
+                                <option value="energia">Energia</option>
+                                <option value="agua">Agua</option>
+                                <option value="produtos">Produtos</option>
+                                <option value="manutencao">Manutencao</option>
+                                <option value="salario">Salario</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select name="tipo" class="form-select">
+                                <option value="fixa">Fixa</option>
+                                <option value="variavel">Variavel</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Valor *</label>
+                            <input type="number" name="valor" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Vencimento</label>
+                            <input type="date" name="vencimento" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

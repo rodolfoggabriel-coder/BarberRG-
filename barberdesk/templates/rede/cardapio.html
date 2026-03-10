@@ -1,0 +1,85 @@
+{% extends "components/base.html" %}
+{% block title %}Cardapio da Rede - BarberDesk{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-list-check"></i> Cardapio da Rede</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoServico">
+            <i class="bi bi-plus"></i> Servico Padrao
+        </button>
+    </div>
+    <p class="text-muted">Servicos definidos aqui sao herdados por todas as unidades. O dono da unidade pode cobrar mais, nunca menos.</p>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Servico</th>
+                            <th>Preco Minimo</th>
+                            <th>Duracao</th>
+                            <th>Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in servicos %}
+                        <tr>
+                            <td><strong>{{ s.nome }}</strong></td>
+                            <td>R$ {{ "%.2f"|format(s.preco) }}</td>
+                            <td>{{ s.duracao_minutos }} min</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalNovoServico" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('rede.servico_padrao_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Servico Padrao</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Preco Minimo (R$) *</label>
+                            <input type="number" name="preco" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Duracao (min) *</label>
+                            <input type="number" name="duracao" class="form-control" value="30" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Criar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

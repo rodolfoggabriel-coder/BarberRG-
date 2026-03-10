@@ -1,0 +1,98 @@
+{% extends "components/base.html" %}
+{% block title %}Rede - BarberDesk{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk <span class="badge bg-primary">Rede</span>
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="{{ url_for('rede.relatorios') }}"><i class="bi bi-bar-chart"></i> Relatorios</a>
+            <a class="nav-link" href="{{ url_for('rede.cardapio') }}"><i class="bi bi-list-check"></i> Cardapio</a>
+            <a class="nav-link" href="{{ url_for('rede.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-buildings"></i> {{ grupo.nome }} - Painel Consolidado</h4>
+
+    <!-- Metricas consolidadas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="text-primary">{{ unidades|length }}</h4>
+                    <small class="text-muted">Unidades</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="text-success">R$ {{ "%.2f"|format(faturamento_total) }}</h4>
+                    <small class="text-muted">Faturamento Mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>{{ agendamentos_total }}</h4>
+                    <small class="text-muted">Agendamentos Mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="text-warning">R$ {{ "%.2f"|format(royalties_total) }}</h4>
+                    <small class="text-muted">Royalties</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unidades -->
+    <div class="row g-3">
+        {% for u in unidades %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5>{{ u.nome }}</h5>
+                    <p class="text-muted small mb-3">{{ u.endereco or '' }}</p>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <strong>R$ {{ "%.0f"|format(u.faturamento_mes) }}</strong><br>
+                            <small class="text-muted">Faturamento</small>
+                        </div>
+                        <div class="col-4">
+                            <strong>{{ u.agendamentos_mes }}</strong><br>
+                            <small class="text-muted">Agendamentos</small>
+                        </div>
+                        <div class="col-4">
+                            <strong>{{ u.ocupacao }}%</strong><br>
+                            <small class="text-muted">Ocupacao</small>
+                        </div>
+                    </div>
+                    {% if u.alertas %}
+                    <div class="mt-2">
+                        {% for a in u.alertas %}
+                        <small class="text-danger"><i class="bi bi-exclamation-circle"></i> {{ a }}</small><br>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{{ url_for('rede.ver_unidade', id=u.id) }}" class="btn btn-sm btn-outline-primary w-100">Ver Painel</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

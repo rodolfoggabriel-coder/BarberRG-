@@ -1,0 +1,207 @@
+{% extends "components/base.html" %}
+{% block title %}Setup - BarberDesk{% endblock %}
+{% block body_class %}bg-dark{% endblock %}
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-8">
+        <div class="card shadow border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-scissors display-4 text-primary"></i>
+                    <h3>Configure sua Barbearia</h3>
+                    <p class="text-muted">Passo {{ step }} de 4</p>
+                    <div class="progress mb-4" style="height: 6px;">
+                        <div class="progress-bar" style="width: {{ (step / 4) * 100 }}%"></div>
+                    </div>
+                </div>
+
+                {% if step == 1 %}
+                <form method="POST">
+                    <input type="hidden" name="step" value="1">
+                    <h5 class="mb-3"><i class="bi bi-shop"></i> Dados da Barbearia</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Barbearia *</label>
+                        <input type="text" name="nome" class="form-control" required placeholder="Ex: Barbearia do Joao">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" name="telefone" class="form-control" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required placeholder="seu@email.com">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Endereco</label>
+                        <input type="text" name="endereco" class="form-control" placeholder="Rua, numero, bairro">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha de acesso *</label>
+                        <input type="password" name="senha" class="form-control" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Proximo <i class="bi bi-arrow-right"></i></button>
+                </form>
+
+                {% elif step == 2 %}
+                <form method="POST">
+                    <input type="hidden" name="step" value="2">
+                    <h5 class="mb-3"><i class="bi bi-clock"></i> Horarios de Funcionamento</h5>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Abertura</label>
+                            <input type="time" name="abertura" class="form-control" value="08:00" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Fechamento</label>
+                            <input type="time" name="fechamento" class="form-control" value="20:00" required>
+                        </div>
+                    </div>
+                    <h6 class="mb-2">Dias de funcionamento</h6>
+                    {% set dias = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'] %}
+                    {% for dia in dias %}
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" name="dias" value="{{ loop.index0 }}"
+                            {% if loop.index0 in [1,2,3,4,5,6] %}checked{% endif %}>
+                        <label class="form-check-label">{{ dia }}</label>
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Proximo <i class="bi bi-arrow-right"></i></button>
+                </form>
+
+                {% elif step == 3 %}
+                <form method="POST">
+                    <input type="hidden" name="step" value="3">
+                    <h5 class="mb-3"><i class="bi bi-person-badge"></i> Cadastro de Barbeiros</h5>
+                    <p class="text-muted small">Cadastre pelo menos 1 barbeiro. Voce pode adicionar mais depois.</p>
+                    <div id="barbeiros-container">
+                        <div class="card mb-3 barbeiro-card">
+                            <div class="card-body">
+                                <h6>Barbeiro 1</h6>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <input type="text" name="barbeiro_nome_1" class="form-control" placeholder="Nome" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <input type="tel" name="barbeiro_telefone_1" class="form-control" placeholder="Telefone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <input type="text" name="barbeiro_pin_1" class="form-control" placeholder="PIN 4 digitos" maxlength="4" pattern="\d{4}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <input type="number" name="barbeiro_comissao_1" class="form-control" placeholder="% Comissao" value="50" min="0" max="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="adicionarBarbeiro()">
+                        <i class="bi bi-plus-circle"></i> Adicionar barbeiro
+                    </button>
+                    <button type="submit" class="btn btn-primary w-100">Proximo <i class="bi bi-arrow-right"></i></button>
+                </form>
+
+                {% elif step == 4 %}
+                <form method="POST">
+                    <input type="hidden" name="step" value="4">
+                    <h5 class="mb-3"><i class="bi bi-list-check"></i> Catalogo de Servicos</h5>
+                    <p class="text-muted small">Cadastre seus servicos com preco e duracao.</p>
+                    <div id="servicos-container">
+                        <div class="card mb-3 servico-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" name="servico_nome_1" class="form-control" placeholder="Ex: Corte" required>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="input-group">
+                                            <span class="input-group-text">R$</span>
+                                            <input type="number" name="servico_preco_1" class="form-control" placeholder="35.00" step="0.01" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="input-group">
+                                            <input type="number" name="servico_duracao_1" class="form-control" placeholder="30" value="30" required>
+                                            <span class="input-group-text">min</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="adicionarServico()">
+                        <i class="bi bi-plus-circle"></i> Adicionar servico
+                    </button>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-check-circle"></i> Concluir Setup
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let barbCount = 1;
+let servCount = 1;
+
+function adicionarBarbeiro() {
+    barbCount++;
+    const html = `
+    <div class="card mb-3 barbeiro-card">
+        <div class="card-body">
+            <h6>Barbeiro ${barbCount}</h6>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <input type="text" name="barbeiro_nome_${barbCount}" class="form-control" placeholder="Nome" required>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <input type="tel" name="barbeiro_telefone_${barbCount}" class="form-control" placeholder="Telefone" required>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <input type="text" name="barbeiro_pin_${barbCount}" class="form-control" placeholder="PIN 4 digitos" maxlength="4" pattern="\\d{4}" required>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <input type="number" name="barbeiro_comissao_${barbCount}" class="form-control" placeholder="% Comissao" value="50" min="0" max="100">
+                </div>
+            </div>
+        </div>
+    </div>`;
+    document.getElementById('barbeiros-container').insertAdjacentHTML('beforeend', html);
+}
+
+function adicionarServico() {
+    servCount++;
+    const html = `
+    <div class="card mb-3 servico-card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <input type="text" name="servico_nome_${servCount}" class="form-control" placeholder="Servico" required>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        <input type="number" name="servico_preco_${servCount}" class="form-control" placeholder="35.00" step="0.01" required>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="input-group">
+                        <input type="number" name="servico_duracao_${servCount}" class="form-control" placeholder="30" value="30" required>
+                        <span class="input-group-text">min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    document.getElementById('servicos-container').insertAdjacentHTML('beforeend', html);
+}
+</script>
+{% endblock %}
+{% block footer %}{% endblock %}

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.so
+*.db
+*.sqlite3
+.env
+venv/
+env/
+.venv/
+instance/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+barberdesk/static/uploads/
+.DS_Store

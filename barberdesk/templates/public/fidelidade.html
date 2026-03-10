@@ -1,0 +1,75 @@
+{% extends "components/base.html" %}
+{% block title %}Cartao Fidelidade{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        {% if cliente %}
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-star-fill display-3"></i>
+                <h3 class="mt-3">{{ cliente.nome }}</h3>
+                <p class="mb-4">{{ barbearia.nome }}</p>
+
+                <div class="bg-white bg-opacity-25 rounded p-4 mb-4">
+                    <h1 class="display-2 fw-bold">{{ cliente.pontos_fidelidade }}</h1>
+                    <p class="mb-0">pontos</p>
+                </div>
+
+                {% set config = barbearia.get_config_fidelidade() %}
+                {% set falta = config.pontos_para_desconto - cliente.pontos_fidelidade %}
+                {% if falta > 0 %}
+                <p>Faltam <strong>{{ falta }}</strong> pontos para R$ {{ "%.2f"|format(config.valor_desconto) }} de desconto!</p>
+                <div class="progress bg-white bg-opacity-25" style="height: 8px;">
+                    <div class="progress-bar bg-warning" style="width: {{ (cliente.pontos_fidelidade / config.pontos_para_desconto * 100) }}%"></div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning text-dark">
+                    <i class="bi bi-gift"></i> Voce tem desconto disponivel de <strong>R$ {{ "%.2f"|format(config.valor_desconto) }}</strong>!
+                </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <a href="{{ url_for('public.agendar', slug=barbearia.slug) }}" class="btn btn-light">
+                        <i class="bi bi-calendar-plus"></i> Agendar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historico -->
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-header bg-white"><h6 class="mb-0">Historico</h6></div>
+            <div class="card-body">
+                {% for ag in historico %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ ag.data.strftime('%d/%m') }} - {{ ag.servico.nome }}</span>
+                    <small class="text-muted">{{ ag.barbeiro.nome }}</small>
+                </div>
+                {% else %}
+                <p class="text-muted small text-center">Sem historico.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Busca por telefone -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-star display-3 text-primary"></i>
+                <h3 class="mt-3">Cartao Fidelidade</h3>
+                <p class="text-muted">Consulte seus pontos</p>
+                <form method="GET" class="mt-4">
+                    <div class="input-group">
+                        <input type="tel" name="telefone" class="form-control form-control-lg" placeholder="Seu telefone" required>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

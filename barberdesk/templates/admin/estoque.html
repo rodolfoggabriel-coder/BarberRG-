@@ -1,0 +1,160 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Estoque - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-box"></i> Estoque</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoProduto">
+            <i class="bi bi-plus"></i> Novo Produto
+        </button>
+    </div>
+
+    {% if alertas_estoque %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i> <strong>{{ alertas_estoque|length }}</strong> produto(s) abaixo do estoque minimo!
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Estoque</th>
+                            <th>Minimo</th>
+                            <th>Custo</th>
+                            <th>Venda</th>
+                            <th>Status</th>
+                            <th>Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in produtos %}
+                        <tr class="{{ 'table-warning' if p.estoque_atual <= p.estoque_minimo }}">
+                            <td><strong>{{ p.nome }}</strong> <small class="text-muted">({{ p.unidade }})</small></td>
+                            <td>{{ p.estoque_atual }}</td>
+                            <td>{{ p.estoque_minimo }}</td>
+                            <td>R$ {{ "%.2f"|format(p.preco_custo) }}</td>
+                            <td>R$ {{ "%.2f"|format(p.preco_venda) }}</td>
+                            <td>
+                                {% if p.estoque_atual <= p.estoque_minimo %}
+                                <span class="badge bg-danger">Baixo</span>
+                                {% else %}
+                                <span class="badge bg-success">OK</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalMovimentar" data-produto-id="{{ p.id }}" data-produto-nome="{{ p.nome }}">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Produto -->
+<div class="modal fade" id="modalNovoProduto" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.produto_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label">Unidade</label>
+                            <select name="unidade" class="form-select">
+                                <option value="un">Unidade</option>
+                                <option value="ml">mL</option>
+                                <option value="kg">Kg</option>
+                            </select>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">Estoque Atual</label>
+                            <input type="number" name="estoque" class="form-control" value="0" step="0.01">
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">Estoque Min.</label>
+                            <input type="number" name="estoque_min" class="form-control" value="5" step="0.01">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Preco Custo</label>
+                            <input type="number" name="preco_custo" class="form-control" step="0.01" value="0">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Preco Venda</label>
+                            <input type="number" name="preco_venda" class="form-control" step="0.01" value="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Movimentar Estoque -->
+<div class="modal fade" id="modalMovimentar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.movimentar_estoque') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Movimentar Estoque</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="produto_id" id="mov-produto-id">
+                    <p><strong id="mov-produto-nome"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select name="tipo" class="form-select">
+                            <option value="entrada">Entrada (compra)</option>
+                            <option value="saida">Saida (uso)</option>
+                            <option value="ajuste">Ajuste (inventario)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" name="quantidade" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo</label>
+                        <input type="text" name="motivo" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('modalMovimentar').addEventListener('show.bs.modal', function(e) {
+    const btn = e.relatedTarget;
+    document.getElementById('mov-produto-id').value = btn.dataset.produtoId;
+    document.getElementById('mov-produto-nome').textContent = btn.dataset.produtoNome;
+});
+</script>
+{% endblock %}

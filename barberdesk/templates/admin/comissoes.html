@@ -1,0 +1,93 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Comissoes - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-percent"></i> Comissoes</h4>
+        <div class="d-flex gap-2">
+            <select id="filtro-status" class="form-select form-select-sm" style="width: auto;">
+                <option value="pendente" {{ 'selected' if filtro_status == 'pendente' }}>Pendentes</option>
+                <option value="pago" {{ 'selected' if filtro_status == 'pago' }}>Pagas</option>
+                <option value="todas" {{ 'selected' if filtro_status == 'todas' }}>Todas</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Resumo por barbeiro -->
+    <div class="row g-3 mb-4">
+        {% for b in resumo_barbeiros %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>{{ b.nome }}</h6>
+                            <p class="text-muted small mb-0">{{ b.percentual }}% comissao</p>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="text-danger mb-0">R$ {{ "%.2f"|format(b.pendente) }}</h5>
+                            <small class="text-muted">pendente</small>
+                        </div>
+                    </div>
+                    {% if b.pendente > 0 %}
+                    <form method="POST" action="{{ url_for('admin.pagar_comissao', barbeiro_id=b.id) }}" class="mt-2">
+                        <button type="submit" class="btn btn-sm btn-success w-100" onclick="return confirm('Confirmar pagamento de R$ {{ "%.2f"|format(b.pendente) }} para {{ b.nome }}?')">
+                            <i class="bi bi-check-circle"></i> Marcar como Pago
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Lista detalhada -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white"><h6 class="mb-0">Detalhamento</h6></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Barbeiro</th>
+                            <th>Valor Bruto</th>
+                            <th>%</th>
+                            <th>Comissao</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in comissoes %}
+                        <tr>
+                            <td>{{ c.data_geracao.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ c.barbeiro.nome }}</td>
+                            <td>R$ {{ "%.2f"|format(c.valor_bruto) }}</td>
+                            <td>{{ c.percentual }}%</td>
+                            <td><strong>R$ {{ "%.2f"|format(c.valor_comissao) }}</strong></td>
+                            <td>
+                                {% if c.status == 'pendente' %}
+                                <span class="badge bg-warning text-dark">Pendente</span>
+                                {% else %}
+                                <span class="badge bg-success">Pago</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('filtro-status').addEventListener('change', function() {
+    window.location = '{{ url_for("admin.comissoes") }}?status=' + this.value;
+});
+</script>
+{% endblock %}

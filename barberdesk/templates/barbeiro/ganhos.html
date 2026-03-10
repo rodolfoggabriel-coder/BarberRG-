@@ -1,0 +1,73 @@
+{% extends "components/barbeiro_base.html" %}
+{% block title %}Meus Ganhos - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="pt-4">
+    <h5 class="mb-3"><i class="bi bi-cash-coin"></i> Meus Ganhos</h5>
+
+    <!-- Resumo -->
+    <div class="row g-3 mb-4">
+        <div class="col-4">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body py-3">
+                    <h4 class="text-success mb-0">R$ {{ "%.2f"|format(ganhos_hoje) }}</h4>
+                    <small class="text-muted">Hoje</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body py-3">
+                    <h4 class="text-info mb-0">R$ {{ "%.2f"|format(ganhos_semana) }}</h4>
+                    <small class="text-muted">Semana</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body py-3">
+                    <h4 class="text-warning mb-0">R$ {{ "%.2f"|format(ganhos_mes) }}</h4>
+                    <small class="text-muted">Mes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pendente -->
+    <div class="card bg-dark border-warning mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="text-warning mb-0">Comissao Pendente</h6>
+                <small class="text-muted">Aguardando repasse do dono</small>
+            </div>
+            <h4 class="text-warning mb-0">R$ {{ "%.2f"|format(pendente) }}</h4>
+        </div>
+    </div>
+
+    <!-- Lista detalhada -->
+    <h6 class="mb-2">Detalhamento</h6>
+    {% for c in comissoes %}
+    <div class="card bg-dark border-secondary mb-2">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted">{{ c.data_geracao.strftime('%d/%m') }}</small>
+                    <span class="ms-2">R$ {{ "%.2f"|format(c.valor_bruto) }}</span>
+                    <small class="text-muted">({{ c.percentual }}%)</small>
+                </div>
+                <div>
+                    <strong class="text-success">R$ {{ "%.2f"|format(c.valor_comissao) }}</strong>
+                    {% if c.status == 'pendente' %}
+                    <span class="badge bg-warning text-dark ms-1">Pendente</span>
+                    {% else %}
+                    <span class="badge bg-success ms-1">Pago</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted text-center">Sem comissoes ainda.</p>
+    {% endfor %}
+</div>
+{% endblock %}

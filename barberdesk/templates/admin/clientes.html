@@ -1,0 +1,69 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Clientes - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-people"></i> Clientes</h4>
+        <div class="d-flex gap-2">
+            <input type="text" id="busca-cliente" class="form-control form-control-sm" placeholder="Buscar por nome ou telefone...">
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabela-clientes">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Pontos</th>
+                            <th>Visitas</th>
+                            <th>Ultima Visita</th>
+                            <th>Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        <tr>
+                            <td>
+                                <strong>{{ c.nome }}</strong>
+                                {% if c.observacoes %}
+                                <br><small class="text-warning"><i class="bi bi-exclamation-circle"></i> {{ c.observacoes }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ c.telefone }}</td>
+                            <td><span class="badge bg-warning text-dark">{{ c.pontos_fidelidade }} pts</span></td>
+                            <td>{{ c.total_visitas }}</td>
+                            <td>{{ c.ultima_visita or 'Nunca' }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.cliente_detalhe', id=c.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Nenhum cliente cadastrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('busca-cliente').addEventListener('input', function() {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabela-clientes tbody tr');
+    linhas.forEach(tr => {
+        tr.style.display = tr.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

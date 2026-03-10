@@ -1,0 +1,88 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Barbeiros - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-person-badge"></i> Barbeiros</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoBarbeiro">
+            <i class="bi bi-plus"></i> Novo Barbeiro
+        </button>
+    </div>
+
+    <div class="row g-3">
+        {% for b in barbeiros %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    {% if b.foto %}
+                    <img src="{{ url_for('static', filename='uploads/' + b.foto) }}" class="rounded-circle mb-2" width="80" height="80" style="object-fit: cover;">
+                    {% else %}
+                    <i class="bi bi-person-circle display-4 text-primary"></i>
+                    {% endif %}
+                    <h5 class="mt-2">{{ b.nome }}</h5>
+                    <p class="text-muted small">{{ b.telefone }}</p>
+                    <div class="d-flex justify-content-around text-center mb-3">
+                        <div>
+                            <strong>{{ b.percentual_comissao }}%</strong><br>
+                            <small class="text-muted">Comissao</small>
+                        </div>
+                        <div>
+                            <strong>{{ b.atendimentos_mes }}</strong><br>
+                            <small class="text-muted">Atend./mes</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{{ url_for('admin.barbeiro_editar', id=b.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <span class="badge bg-{{ 'success' if b.ativo else 'secondary' }} align-self-center">
+                            {{ 'Ativo' if b.ativo else 'Inativo' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal Novo Barbeiro -->
+<div class="modal fade" id="modalNovoBarbeiro" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.barbeiro_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Barbeiro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefone *</label>
+                        <input type="tel" name="telefone" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">PIN de acesso (4 digitos) *</label>
+                        <input type="text" name="pin" class="form-control" maxlength="4" pattern="\d{4}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">% Comissao</label>
+                        <input type="number" name="comissao" class="form-control" value="50" min="0" max="100">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="comissao_liquido">
+                        <label class="form-check-label">Comissao sobre valor liquido (pos-desconto)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "components/barbeiro_base.html" %}
+{% block title %}Minha Agenda - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-calendar3"></i> Hoje, {{ hoje }}</h5>
+        <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalBloquear">
+            <i class="bi bi-lock"></i> Bloquear
+        </button>
+    </div>
+
+    {% if agendamentos %}
+    {% for ag in agendamentos %}
+    <div class="card bg-dark border-secondary mb-3 {{ 'border-success' if ag.status == 'concluido' }}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5 class="mb-1">{{ ag.hora_inicio }} - {{ ag.hora_fim }}</h5>
+                    <h6 class="text-primary mb-1">{{ ag.cliente.nome }}</h6>
+                    <p class="mb-0 text-muted">{{ ag.servico.nome }} - R$ {{ "%.2f"|format(ag.valor) }}</p>
+                    {% if ag.cliente.observacoes %}
+                    <small class="text-warning"><i class="bi bi-exclamation-circle"></i> {{ ag.cliente.observacoes }}</small>
+                    {% endif %}
+                </div>
+                <div class="text-end">
+                    {% if ag.status == 'agendado' %}
+                    <span class="badge bg-primary mb-2">Agendado</span>
+                    {% elif ag.status == 'confirmado' %}
+                    <span class="badge bg-info mb-2">Confirmado</span>
+                    {% elif ag.status == 'concluido' %}
+                    <span class="badge bg-success mb-2">Concluido</span>
+                    {% elif ag.status == 'cancelado' %}
+                    <span class="badge bg-danger mb-2">Cancelado</span>
+                    {% endif %}
+
+                    {% if ag.status in ['agendado', 'confirmado'] %}
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('barbeiro.concluir', id=ag.id) }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-check-lg"></i> Concluir
+                        </a>
+                        <a href="{{ url_for('barbeiro.cancelar', id=ag.id) }}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <p class="text-muted mt-3">Nenhum agendamento para hoje.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal Bloquear Horario -->
+<div class="modal fade" id="modalBloquear" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <form method="POST" action="{{ url_for('barbeiro.bloquear_horario') }}">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Bloquear Horario</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Data</label>
+                        <input type="date" name="data" class="form-control bg-dark text-white border-secondary" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Inicio</label>
+                            <input type="time" name="hora_inicio" class="form-control bg-dark text-white border-secondary" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Fim</label>
+                            <input type="time" name="hora_fim" class="form-control bg-dark text-white border-secondary" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo</label>
+                        <input type="text" name="motivo" class="form-control bg-dark text-white border-secondary" placeholder="Opcional">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="submit" class="btn btn-primary w-100">Bloquear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

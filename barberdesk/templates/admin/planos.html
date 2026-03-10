@@ -1,0 +1,155 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Planos de Assinatura - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-credit-card"></i> Planos de Assinatura</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoPlano">
+            <i class="bi bi-plus"></i> Novo Plano
+        </button>
+    </div>
+
+    <!-- MRR e metricas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+                <div class="card-body text-center">
+                    <h4 class="text-success">R$ {{ "%.2f"|format(mrr) }}</h4>
+                    <small class="text-muted">MRR (Receita Recorrente)</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>{{ assinantes_ativos }}</h4>
+                    <small class="text-muted">Assinantes Ativos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>{{ renovacoes_proximas }}</h4>
+                    <small class="text-muted">Renovacoes em 7 dias</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="text-danger">{{ inadimplentes }}</h4>
+                    <small class="text-muted">Inadimplentes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planos -->
+    <div class="row g-3 mb-4">
+        {% for p in planos %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5>{{ p.nome }}</h5>
+                        <span class="badge bg-{{ 'success' if p.ativo else 'secondary' }}">{{ 'Ativo' if p.ativo else 'Inativo' }}</span>
+                    </div>
+                    <h3 class="text-primary">R$ {{ "%.2f"|format(p.preco_mensal) }}<small class="text-muted fs-6">/mes</small></h3>
+                    <p class="text-muted small">{{ p.descricao or '' }}</p>
+                    {% set creditos = p.get_creditos() %}
+                    {% if creditos %}
+                    <h6>Creditos mensais:</h6>
+                    <ul class="list-unstyled small">
+                        {% for tipo, qtd in creditos.items() %}
+                        <li><i class="bi bi-check-circle text-success"></i> {{ qtd }}x {{ tipo }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <small class="text-muted">{{ p.assinaturas|selectattr('status', 'eq', 'ativo')|list|length }} assinantes</small>
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{{ url_for('admin.plano_editar', id=p.id) }}" class="btn btn-sm btn-outline-primary">Editar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Assinantes -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white"><h6 class="mb-0">Assinantes</h6></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Plano</th>
+                            <th>Status</th>
+                            <th>Creditos Restantes</th>
+                            <th>Renovacao</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assinaturas %}
+                        <tr>
+                            <td>{{ a.cliente.nome }}</td>
+                            <td>{{ a.plano.nome }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if a.status == 'ativo' else 'danger' if a.status == 'inadimplente' else 'secondary' }}">{{ a.status }}</span>
+                            </td>
+                            <td>{{ a.creditos_restantes }}</td>
+                            <td>{{ a.data_renovacao.strftime('%d/%m/%Y') if a.data_renovacao else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Plano -->
+<div class="modal fade" id="modalNovoPlano" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.plano_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Plano de Assinatura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required placeholder="Ex: Plano Prata">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Preco Mensal *</label>
+                        <input type="number" name="preco" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descricao</label>
+                        <textarea name="descricao" class="form-control" rows="2"></textarea>
+                    </div>
+                    <h6>Creditos Mensais</h6>
+                    {% for s in servicos %}
+                    <div class="row mb-2">
+                        <div class="col-8"><label class="form-label small">{{ s.nome }}</label></div>
+                        <div class="col-4"><input type="number" name="credito_{{ s.id }}" class="form-control form-control-sm" value="0" min="0"></div>
+                    </div>
+                    {% endfor %}
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" name="creditos_expiram" checked>
+                        <label class="form-check-label">Creditos nao usados expiram no mes</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Criar Plano</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Servicos - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-list-check"></i> Servicos</h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoServico">
+            <i class="bi bi-plus"></i> Novo Servico
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Servico</th>
+                            <th>Preco</th>
+                            <th>Duracao</th>
+                            <th>Creditos Plano</th>
+                            <th>Status</th>
+                            <th>Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in servicos %}
+                        <tr>
+                            <td><strong>{{ s.nome }}</strong></td>
+                            <td>R$ {{ "%.2f"|format(s.preco) }}</td>
+                            <td>{{ s.duracao_minutos }} min</td>
+                            <td>{{ s.creditos_plano }}</td>
+                            <td><span class="badge bg-{{ 'success' if s.ativo else 'secondary' }}">{{ 'Ativo' if s.ativo else 'Inativo' }}</span></td>
+                            <td>
+                                <a href="{{ url_for('admin.servico_editar', id=s.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('admin.servico_toggle', id=s.id) }}" class="btn btn-sm btn-outline-{{ 'danger' if s.ativo else 'success' }}">
+                                    <i class="bi bi-{{ 'pause' if s.ativo else 'play' }}"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Servico -->
+<div class="modal fade" id="modalNovoServico" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.servico_criar') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Servico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required placeholder="Ex: Corte Masculino">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Preco (R$) *</label>
+                            <input type="number" name="preco" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Duracao (min) *</label>
+                            <input type="number" name="duracao" class="form-control" value="30" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Creditos do Plano</label>
+                        <input type="number" name="creditos" class="form-control" value="1" min="1">
+                        <small class="text-muted">Quantos creditos de assinatura este servico consome</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

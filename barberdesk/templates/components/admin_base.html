@@ -1,0 +1,76 @@
+{% extends "components/base.html" %}
+
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
+            <i class="bi bi-scissors"></i> BarberDesk
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.agenda') }}">
+                        <i class="bi bi-calendar3"></i> Agenda
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.clientes') }}">
+                        <i class="bi bi-people"></i> Clientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.barbeiros') }}">
+                        <i class="bi bi-person-badge"></i> Barbeiros
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.servicos') }}">
+                        <i class="bi bi-list-check"></i> Servicos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.caixa') }}">
+                        <i class="bi bi-cash-stack"></i> Caixa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.comissoes') }}">
+                        <i class="bi bi-percent"></i> Comissoes
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i> Mais
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('admin.estoque') }}"><i class="bi bi-box"></i> Estoque</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.fidelidade') }}"><i class="bi bi-star"></i> Fidelidade</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.planos') }}"><i class="bi bi-credit-card"></i> Planos</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.financeiro') }}"><i class="bi bi-graph-up"></i> Financeiro</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.metas') }}"><i class="bi bi-trophy"></i> Metas</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.configuracoes') }}"><i class="bi bi-sliders"></i> Configuracoes</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Sair
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}

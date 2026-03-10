@@ -1,0 +1,128 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Caixa - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-cash-stack"></i> Caixa do Dia</h4>
+        <input type="date" id="data-caixa" class="form-control form-control-sm" style="width: auto;" value="{{ data_selecionada }}">
+    </div>
+
+    <!-- Resumo do dia -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+                <div class="card-body text-center">
+                    <h4 class="text-success">R$ {{ "%.2f"|format(total_dia) }}</h4>
+                    <small class="text-muted">Total Faturado</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>{{ atendimentos_dia }}</h4>
+                    <small class="text-muted">Atendimentos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>R$ {{ "%.2f"|format(ticket_medio) }}</h4>
+                    <small class="text-muted">Ticket Medio</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h4>R$ {{ "%.2f"|format(comissoes_dia) }}</h4>
+                    <small class="text-muted">Comissoes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Por forma de pagamento -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0">Por Forma de Pagamento</h6></div>
+                <div class="card-body">
+                    {% for forma, valor in por_forma.items() %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>
+                            {% if forma == 'dinheiro' %}<i class="bi bi-cash"></i>
+                            {% elif forma == 'pix' %}<i class="bi bi-qr-code"></i>
+                            {% elif forma == 'cartao_debito' %}<i class="bi bi-credit-card"></i>
+                            {% elif forma == 'cartao_credito' %}<i class="bi bi-credit-card-2-front"></i>
+                            {% endif %}
+                            {{ forma|replace('_', ' ')|title }}
+                        </span>
+                        <strong>R$ {{ "%.2f"|format(valor) }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0">Por Barbeiro</h6></div>
+                <div class="card-body">
+                    {% for b in por_barbeiro %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ b.nome }}</span>
+                        <div>
+                            <span class="text-muted small">{{ b.atendimentos }} atend.</span>
+                            <strong class="ms-2">R$ {{ "%.2f"|format(b.total) }}</strong>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de pagamentos -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white"><h6 class="mb-0">Pagamentos do Dia</h6></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Horario</th>
+                            <th>Cliente</th>
+                            <th>Barbeiro</th>
+                            <th>Servico</th>
+                            <th>Forma</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pagamentos %}
+                        <tr>
+                            <td>{{ p.agendamento.hora_inicio }}</td>
+                            <td>{{ p.agendamento.cliente.nome }}</td>
+                            <td>{{ p.agendamento.barbeiro.nome }}</td>
+                            <td>{{ p.agendamento.servico.nome }}</td>
+                            <td>{{ p.forma|replace('_', ' ')|title }}</td>
+                            <td>R$ {{ "%.2f"|format(p.valor_pago) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('data-caixa').addEventListener('change', function() {
+    window.location = '{{ url_for("admin.caixa") }}?data=' + this.value;
+});
+</script>
+{% endblock %}

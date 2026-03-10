@@ -1,0 +1,45 @@
+{% extends "components/base.html" %}
+
+{% block body_class %}bg-dark text-white{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark border-bottom border-secondary fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('barbeiro.agenda') }}">
+            <i class="bi bi-scissors"></i> BarberDesk
+        </a>
+        <div class="d-flex align-items-center">
+            <span class="text-light me-3 small">{{ barbeiro_nome }}</span>
+            <a href="{{ url_for('barbeiro.logout') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Bottom navigation for mobile -->
+<nav class="navbar navbar-dark bg-dark fixed-bottom border-top border-secondary d-lg-none">
+    <div class="container-fluid d-flex justify-content-around">
+        <a href="{{ url_for('barbeiro.agenda') }}" class="nav-link text-center px-2">
+            <i class="bi bi-calendar3 d-block"></i>
+            <small>Agenda</small>
+        </a>
+        <a href="{{ url_for('barbeiro.ganhos') }}" class="nav-link text-center px-2">
+            <i class="bi bi-cash-coin d-block"></i>
+            <small>Ganhos</small>
+        </a>
+        <a href="{{ url_for('barbeiro.portfolio') }}" class="nav-link text-center px-2">
+            <i class="bi bi-camera d-block"></i>
+            <small>Portfolio</small>
+        </a>
+        <a href="{{ url_for('barbeiro.metas') }}" class="nav-link text-center px-2">
+            <i class="bi bi-trophy d-block"></i>
+            <small>Metas</small>
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block main_class %}container pt-5 pb-5{% endblock %}
+
+{% block footer %}{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "components/base.html" %}
+{% block title %}Relatorios - Rede BarberDesk{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('rede.dashboard') }}"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <h4 class="mb-4"><i class="bi bi-bar-chart"></i> Relatorios Consolidados</h4>
+
+    <!-- Ranking de unidades -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0">Ranking de Unidades</h5></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Unidade</th>
+                            <th>Faturamento</th>
+                            <th>Ticket Medio</th>
+                            <th>Ocupacao</th>
+                            <th>Royalty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in ranking %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><strong>{{ u.nome }}</strong></td>
+                            <td>R$ {{ "%.2f"|format(u.faturamento) }}</td>
+                            <td>R$ {{ "%.2f"|format(u.ticket_medio) }}</td>
+                            <td>{{ u.ocupacao }}%</td>
+                            <td>R$ {{ "%.2f"|format(u.royalty) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

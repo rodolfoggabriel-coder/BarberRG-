@@ -1,0 +1,149 @@
+{% extends "components/admin_base.html" %}
+{% block title %}Agenda - BarberDesk{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-calendar3"></i> Agenda</h4>
+        <div class="d-flex gap-2">
+            <input type="date" id="data-filtro" class="form-control form-control-sm" value="{{ data_selecionada }}">
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovoAgendamento">
+                <i class="bi bi-plus"></i> Novo
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="?data={{ data_selecionada }}" class="btn btn-sm {{ 'btn-primary' if not barbeiro_filtro else 'btn-outline-primary' }}">Todos</a>
+                {% for b in barbeiros %}
+                <a href="?data={{ data_selecionada }}&barbeiro={{ b.id }}" class="btn btn-sm {{ 'btn-primary' if barbeiro_filtro == b.id else 'btn-outline-primary' }}">{{ b.nome }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline por barbeiro -->
+    {% for b in barbeiros %}
+    {% if not barbeiro_filtro or barbeiro_filtro == b.id %}
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-person"></i> {{ b.nome }}</h6>
+            <small class="text-muted">{{ b.agendamentos_dia|length }} agendamentos | {{ b.taxa_ocupacao }}% ocupado</small>
+        </div>
+        <div class="card-body">
+            {% if b.agendamentos_dia %}
+            {% for ag in b.agendamentos_dia %}
+            <div class="d-flex align-items-start mb-3 p-2 rounded {{ 'bg-success bg-opacity-10' if ag.status == 'concluido' else 'bg-light' }}">
+                <div class="me-3 text-center" style="min-width: 60px;">
+                    <strong>{{ ag.hora_inicio }}</strong><br>
+                    <small class="text-muted">{{ ag.hora_fim }}</small>
+                </div>
+                <div class="flex-grow-1">
+                    <strong>{{ ag.cliente.nome }}</strong>
+                    <span class="text-muted"> - {{ ag.servico.nome }}</span>
+                    {% if ag.cliente.observacoes %}
+                    <br><small class="text-warning"><i class="bi bi-exclamation-circle"></i> {{ ag.cliente.observacoes }}</small>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if ag.status == 'agendado' %}
+                    <span class="badge bg-primary">Agendado</span>
+                    {% elif ag.status == 'confirmado' %}
+                    <span class="badge bg-info">Confirmado</span>
+                    {% elif ag.status == 'concluido' %}
+                    <span class="badge bg-success">Concluido</span>
+                    {% elif ag.status == 'cancelado' %}
+                    <span class="badge bg-danger">Cancelado</span>
+                    {% endif %}
+                    <div class="btn-group btn-group-sm mt-1">
+                        {% if ag.status in ['agendado', 'confirmado'] %}
+                        <a href="{{ url_for('admin.concluir_agendamento', id=ag.id) }}" class="btn btn-outline-success" title="Concluir">
+                            <i class="bi bi-check"></i>
+                        </a>
+                        <a href="{{ url_for('admin.cancelar_agendamento', id=ag.id) }}" class="btn btn-outline-danger" title="Cancelar">
+                            <i class="bi bi-x"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-muted text-center small">Sem agendamentos.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Modal Novo Agendamento -->
+<div class="modal fade" id="modalNovoAgendamento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.novo_agendamento') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Agendamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Cliente (telefone)</label>
+                        <input type="tel" name="telefone" class="form-control" required placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Cliente</label>
+                        <input type="text" name="nome_cliente" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Barbeiro</label>
+                        <select name="barbeiro_id" class="form-select" required>
+                            {% for b in barbeiros %}
+                            <option value="{{ b.id }}">{{ b.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Servico</label>
+                        <select name="servico_id" class="form-select" required>
+                            {% for s in servicos %}
+                            <option value="{{ s.id }}">{{ s.nome }} - R$ {{ "%.2f"|format(s.preco) }} ({{ s.duracao_minutos }}min)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Data</label>
+                            <input type="date" name="data" class="form-control" value="{{ data_selecionada }}" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Horario</label>
+                            <input type="time" name="hora" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observacao</label>
+                        <textarea name="observacao" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Agendar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('data-filtro').addEventListener('change', function() {
+    const url = new URL(window.location);
+    url.searchParams.set('data', this.value);
+    window.location = url;
+});
+</script>
+{% endblock %}
