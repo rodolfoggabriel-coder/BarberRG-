@@ -3,8 +3,8 @@
 {% block body_class %}bg-light{% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
+<nav class="navbar navbar-expand-lg bd-navbar fixed-top">
+    <div class="container-fluid px-3">
         <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
             <i class="bi bi-scissors"></i> BarberDesk
         </a>
@@ -50,7 +50,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-gear"></i> Mais
+                        <i class="bi bi-three-dots"></i> Mais
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ url_for('admin.produtos') }}"><i class="bi bi-box"></i> Estoque</a></li>
@@ -75,3 +75,5 @@
     </div>
 </nav>
 {% endblock %}
+
+{% block main_class %}container pt-5 mt-3{% endblock %}

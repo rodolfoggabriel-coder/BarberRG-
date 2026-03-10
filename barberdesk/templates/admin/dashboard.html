@@ -3,86 +3,81 @@
 
 {% block content %}
 <div class="py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
-        <span class="text-muted">{{ hoje }}</span>
+    <div class="dashboard-header">
+        <h4><i class="bi bi-speedometer2 text-gold"></i> Dashboard</h4>
+        <span class="badge bg-primary">{{ hoje }}</span>
     </div>
 
+    <!-- KPI Cards -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-calendar-check display-6 text-primary"></i>
-                    <h3 class="mt-2 mb-0">{{ total_agendamentos }}</h3>
-                    <small class="text-muted">Agendamentos Hoje</small>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="kpi-value">{{ total_agendamentos }}</div>
+                <div class="kpi-label">Agendamentos</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-check-circle display-6 text-success"></i>
-                    <h3 class="mt-2 mb-0">{{ concluidos }}</h3>
-                    <small class="text-muted">Concluidos</small>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--bd-success);"><i class="bi bi-check-circle"></i></div>
+                <div class="kpi-value">{{ concluidos }}</div>
+                <div class="kpi-label">Concluidos</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-cash-coin display-6 text-warning"></i>
-                    <h3 class="mt-2 mb-0">{{ faturamento_dia }}</h3>
-                    <small class="text-muted">Faturamento Hoje</small>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--bd-warning);"><i class="bi bi-cash-coin"></i></div>
+                <div class="kpi-value">{{ faturamento_dia }}</div>
+                <div class="kpi-label">Faturamento</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-percent display-6 text-danger"></i>
-                    <h3 class="mt-2 mb-0">{{ comissoes_pendentes }}</h3>
-                    <small class="text-muted">Comissoes Pendentes</small>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--bd-danger);"><i class="bi bi-percent"></i></div>
+                <div class="kpi-value">{{ comissoes_pendentes }}</div>
+                <div class="kpi-label">Comissoes</div>
             </div>
         </div>
     </div>
 
+    <!-- Secondary stats -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <span class="text-muted">Pendentes</span>
-                    <h4>{{ pendentes }}</h4>
+            <div class="card">
+                <div class="card-body text-center py-3">
+                    <span class="text-muted small text-uppercase">Pendentes</span>
+                    <h4 class="mb-0 mt-1">{{ pendentes }}</h4>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <span class="text-muted">Cancelados</span>
-                    <h4>{{ cancelados }}</h4>
+            <div class="card">
+                <div class="card-body text-center py-3">
+                    <span class="text-muted small text-uppercase">Cancelados</span>
+                    <h4 class="mb-0 mt-1">{{ cancelados }}</h4>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <span class="text-muted">Alertas Estoque</span>
-                    <h4 class="{{ 'text-danger' if alertas_estoque > 0 else 'text-success' }}">{{ alertas_estoque }}</h4>
+            <div class="card">
+                <div class="card-body text-center py-3">
+                    <span class="text-muted small text-uppercase">Alertas Estoque</span>
+                    <h4 class="mb-0 mt-1 {{ 'text-danger' if alertas_estoque > 0 else 'text-gold' }}">{{ alertas_estoque }}</h4>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-calendar3"></i> Proximos Agendamentos</h5>
+    <!-- Upcoming appointments -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="bi bi-calendar3 text-gold"></i> Proximos Agendamentos</h5>
             <a href="{{ url_for('admin.agenda') }}" class="btn btn-sm btn-outline-primary">Ver completa</a>
         </div>
         <div class="card-body">
             {% if proximos %}
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover mb-0">
                     <thead>
                         <tr>
                             <th>Horario</th>
@@ -95,7 +90,7 @@
                     <tbody>
                         {% for ag in proximos %}
                         <tr>
-                            <td><strong>{{ ag.hora_inicio }}</strong> - {{ ag.hora_fim }}</td>
+                            <td><strong class="text-gold">{{ ag.hora_inicio }}</strong> - {{ ag.hora_fim }}</td>
                             <td>{{ ag.cliente.nome }}</td>
                             <td>{{ ag.barbeiro.nome }}</td>
                             <td>{{ ag.servico.nome }}</td>
@@ -106,15 +101,16 @@
                 </table>
             </div>
             {% else %}
-            <p class="text-muted text-center py-4">Nenhum agendamento pendente para hoje.</p>
+            <p class="text-muted text-center py-4 mb-0">Nenhum agendamento pendente para hoje.</p>
             {% endif %}
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+    <!-- Booking link -->
+    <div class="booking-link-card card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
-                <h6 class="mb-1">Link de Agendamento Online</h6>
+                <h6 class="mb-1 text-gold"><i class="bi bi-link-45deg"></i> Link de Agendamento Online</h6>
                 <code id="link-agendamento">{{ request.host_url }}agendar/{{ barbearia.slug }}</code>
             </div>
             <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('link-agendamento').textContent)">

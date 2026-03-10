@@ -2,14 +2,17 @@
 {% block title %}BarberDesk - Agendamento Online para Barbearias{% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg bd-navbar">
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('public.home') }}">
             <i class="bi bi-scissors"></i> <strong>BarberDesk</strong>
         </a>
-        <div class="d-flex">
-            <a href="{{ url_for('barbeiro.login') }}" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-person"></i> Area do Barbeiro
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.login') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-shield-lock"></i> Admin
+            </a>
+            <a href="{{ url_for('barbeiro.login') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-person"></i> Barbeiro
             </a>
         </div>
     </div>
@@ -18,45 +21,56 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="text-center py-5 mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <i class="bi bi-scissors display-1 text-primary mb-3"></i>
-            <h1 class="display-4 fw-bold">BarberDesk</h1>
-            <p class="lead text-muted mb-4">
-                Agendamento online simples e rapido para a sua barbearia favorita.
-            </p>
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="login-logo mb-4">
+                    <div class="icon-wrapper" style="width:90px;height:90px;border-radius:24px;">
+                        <i class="bi bi-scissors" style="font-size:2.5rem;"></i>
+                    </div>
+                </div>
+                <h1>BarberDesk</h1>
+                <p class="lead mb-4">
+                    Agendamento online simples e rapido para a sua barbearia favorita.
+                </p>
+                <a href="{{ url_for('admin.login') }}" class="btn btn-primary btn-lg px-5 py-3">
+                    Comecar Agora <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Features -->
 <section class="py-5">
-    <div class="row g-4 text-center">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <i class="bi bi-calendar-check display-4 text-primary mb-3"></i>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
                     <h5>Agende Online</h5>
-                    <p class="text-muted">Escolha o servico, barbeiro, data e horario sem sair de casa.</p>
+                    <p>Escolha o servico, barbeiro, data e horario sem sair de casa.</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <i class="bi bi-clock display-4 text-primary mb-3"></i>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-clock"></i>
+                    </div>
                     <h5>Sem Espera</h5>
-                    <p class="text-muted">Chegue no horario agendado e seja atendido imediatamente.</p>
+                    <p>Chegue no horario agendado e seja atendido imediatamente.</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <i class="bi bi-star display-4 text-primary mb-3"></i>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-star"></i>
+                    </div>
                     <h5>Avalie</h5>
-                    <p class="text-muted">Deixe sua avaliacao e ajude outros clientes a escolherem o melhor profissional.</p>
+                    <p>Deixe sua avaliacao e ajude outros clientes a escolherem o melhor profissional.</p>
                 </div>
             </div>
         </div>
@@ -65,7 +79,12 @@
 
 <!-- CTA -->
 <section class="text-center py-5">
-    <h3>Sua barbearia usa o BarberDesk?</h3>
-    <p class="text-muted">Peca o link de agendamento ao seu barbeiro e agende pelo celular!</p>
+    <div class="container">
+        <h3 class="mb-3">Sua barbearia usa o BarberDesk?</h3>
+        <p class="text-muted mb-4">Peca o link de agendamento ao seu barbeiro e agende pelo celular!</p>
+        <a href="{{ url_for('admin.setup', step=1) }}" class="btn btn-outline-primary btn-lg">
+            Criar minha barbearia <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
 </section>
 {% endblock %}
